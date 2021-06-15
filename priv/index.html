@@ -15,7 +15,6 @@
 			var source = new EventSource('/eventsource');
 
 					source.addEventListener('message', function(event) {
-					//addStatus("server sent the following: '" + event.data + "'");
 
 					addStatus(event.data);
 						Y = event.data;
@@ -24,25 +23,19 @@
 					}, false);
 
 					source.addEventListener('open', function(event) {
-						//addStatus('eventsource connected.')
 					}, false);
 
 					source.addEventListener('error', function(event) {
-							//window.stop();
 						console.log(Y);
 							location.replace("http://mail-testing.com/results/" + Y);
 
 						if (event.eventPhase == EventSource.CLOSED) {
-							//addStatus('eventsource was clozed.')
 						}
 					}, false);
 			}
 
 			function addStatus(text) {
-			//	document.getElementById('status').innerHTML
-			//	= document.getElementById('status').innerHTML
-			//	+  text + "<br/>";
- 			  document.getElementById('status').innerHTML=text + " secs"; // watch for spelling
+ 			  document.getElementById('status').innerHTML=text + " secs"; 
 			}
 		</script>
 	</head>

@@ -1,6 +1,7 @@
 -module(gen_consume).
 -behaviour(gen_server).
 -export([start_link/1]).
+%-export([start/1]).
 %% gen_server callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
 terminate/2, code_change/3]).
@@ -8,8 +9,9 @@ terminate/2, code_change/3]).
 -record (state,{sender_pid,addr,booked_queue}).
  
 start_link(AdresseDeMerde) ->
+%start(AdresseDeMerde) ->
 	
-gen_server:start_link(?MODULE, [AdresseDeMerde], []).
+gen_server:start_link({local, ?MODULE}, ?MODULE, [AdresseDeMerde], []).
 %gen_server:start( ?MODULE, [AdresseDeMerde], []).
 
 init([AdresseDeMerde]) ->
@@ -33,8 +35,8 @@ InitState = #{},
 Declarations = application:get_env(event_single, consume_declarations),
      {_, Dcls} = Declarations,
 Amqp = #{
-  %name => local_service,
-  name => binary_to_atom(AdresseDeMerde),
+  name => local_service,
+  %name => binary_to_atom(AdresseDeMerde),
   connection => amqp_server,
   function => F,
   %function => fun _Mod:loop/4,
@@ -53,8 +55,7 @@ Amqp = #{
 State2 = #state{sender_pid=_ServicePid,addr=AdresseDeMerde,booked_queue=QBook},
 {ok, State2}.
 
-handle_call(stop, _From, State) -> {stop, normal, stopped, State}.
-%handle_call({pub}, _From, State) -> 	{reply, ok, State+1}.
+handle_call({pub}, _From, State) -> 	{reply, ok, State+1}.
 
 handle_cast({pub2}, State) -> {noreply, State}.
 

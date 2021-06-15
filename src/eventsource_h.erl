@@ -2,20 +2,19 @@
 
 %% @doc EventSource emitter.
 -module(eventsource_h).
-
+-behavior(cowboy_handler).
 -export([init/2]).
 -export([info/3]).
 -export([terminate/3]).
 -record (state,{sender_pid,tab,target}).
 
-init(Req, _State) ->
+init(Req, Target) ->
 	Table = ets:new(?MODULE,[]),
 	process_flag(trap_exit, true),
 
-       <<X:64/big-unsigned-integer>> = crypto:strong_rand_bytes(8),
-       _Random = lists:flatten(io_lib:format("~16.16.0b", [X])), %32=field width, Pad de zero, b est le Mod
-       Target = list_to_binary(_Random++"@mail-testing.com"),
-       %Target = list_to_binary("azerty51@mail-testing.com"),
+       %<<X:64/big-unsigned-integer>> = crypto:strong_rand_bytes(8),
+       %_Random = lists:flatten(io_lib:format("~16.16.0b", [X])), %32=field width, Pad de zero, b est le Mod
+       %Target = list_to_binary(_Random++"@mail-testing.com"),
         io:format("eventsource_h le email en random ~p ~n",[Target]),
         gproc:reg({p, l, Target}),
 
@@ -27,13 +26,18 @@ init(Req, _State) ->
                 #{ delivery_mode => persistent }),
 
   	ets:insert(Table, {Target,30}),
-
+	io:format("eventsource après le turtle:pulbsish ~n"),
         {ok, _SenderPid} = gen_consume:start_link(Target),
+	io:format("eventsource après le gen_consume launch ~n"),
 
 	Req0 = cowboy_req:stream_reply(200, #{
 		<<"content-type">> => <<"text/event-stream">>
 	}, Req),
-	%erlang:send_after(1000, self(), {message, <<"seb@mail-testing.com">>, []}),
+	io:format("eventsource après le stream_reply 200 ~n"),
+
+	%cowboy_req:stream_body("Hello\r\n", nofin, Req),
+	io:format("eventsource après le cowboy_req_stream"),
+	
 	erlang:send_after(1000, self(), {message, Target, []}),
 	State2 = #state{sender_pid=_SenderPid,tab=Table,target=Target},
 	{cowboy_loop, Req0, State2}.
@@ -45,7 +49,7 @@ info({message, Msg,[]}, Req, State)  ->
 	Counter = case ets:lookup(Table, Target) of
 			[{Target,Balance}] -> _NewBalance = Balance - 1
 	end,
-	%io:format("eventsource_h Target ~p ~n",[Target2]),
+	io:format("eventsource_h Target ~p ~n",[Target]),
 	ets:insert(Table, {Target, Counter}),
 
 	cowboy_req:stream_events(#{
