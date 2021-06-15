@@ -1,18 +1,16 @@
 -module(gen_consume).
 -behaviour(gen_server).
-%-export([start_link/1]).
--export([start/1]).
+-export([start_link/1]).
 %% gen_server callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
 terminate/2, code_change/3]).
 -include_lib("amqp_client/include/amqp_client.hrl").
 -record (state,{sender_pid,addr,booked_queue}).
  
-%start_link(AdresseDeMerde) ->
-start(AdresseDeMerde) ->
+start_link(AdresseDeMerde) ->
 	
-%gen_server:start_link({local, ?MODULE}, ?MODULE, [AdresseDeMerde], []).
-gen_server:start( ?MODULE, [AdresseDeMerde], []).
+gen_server:start_link(?MODULE, [AdresseDeMerde], []).
+%gen_server:start( ?MODULE, [AdresseDeMerde], []).
 
 init([AdresseDeMerde]) ->
 	%io:format(">>>>> gen_consume INIT adresse RCPT random ~p ~n",[AdresseDeMerde]),
@@ -55,7 +53,8 @@ Amqp = #{
 State2 = #state{sender_pid=_ServicePid,addr=AdresseDeMerde,booked_queue=QBook},
 {ok, State2}.
 
-handle_call({pub}, _From, State) -> 	{reply, ok, State+1}.
+handle_call(stop, _From, State) -> {stop, normal, stopped, State}.
+%handle_call({pub}, _From, State) -> 	{reply, ok, State+1}.
 
 handle_cast({pub2}, State) -> {noreply, State}.
 

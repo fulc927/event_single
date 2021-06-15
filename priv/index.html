@@ -11,14 +11,15 @@
 						"Sorry but your browser doesn't support the EventSource API";
 				}
 			}
-					function setupEventSource() {
+			function setupEventSource() {
 			var source = new EventSource('/eventsource');
 
 					source.addEventListener('message', function(event) {
 					//addStatus("server sent the following: '" + event.data + "'");
+
 					addStatus(event.data);
 						Y = event.data;
-						//console.log(Y);
+						console.log(Y);
 					
 					}, false);
 
@@ -32,15 +33,16 @@
 							location.replace("http://mail-testing.com/results/" + Y);
 
 						if (event.eventPhase == EventSource.CLOSED) {
-							addStatus('eventsource was clozed.')
+							//addStatus('eventsource was clozed.')
 						}
 					}, false);
 			}
 
 			function addStatus(text) {
-				document.getElementById('status').innerHTML
-				= document.getElementById('status').innerHTML
-				+  text + "<br/>";
+			//	document.getElementById('status').innerHTML
+			//	= document.getElementById('status').innerHTML
+			//	+  text + "<br/>";
+ 			  document.getElementById('status').innerHTML=text + " secs"; // watch for spelling
 			}
 		</script>
 	</head>

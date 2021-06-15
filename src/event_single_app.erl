@@ -43,7 +43,7 @@ start(_Type, _Args) ->
     Dispatch = cowboy_router:compile([
         {"mail-testing.com", [
 	       {"/", cowboy_static, {priv_file, event_single, "index.html"}},
-	       {"/eventsource", eventsource_h, [<<"seb@mail-testing.com">>]},
+	       {"/eventsource", eventsource_h, []},
 	       IdRoute,
 	       CatchallRoute
 	]}

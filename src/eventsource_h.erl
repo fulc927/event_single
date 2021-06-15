@@ -6,42 +6,52 @@
 -export([init/2]).
 -export([info/3]).
 -export([terminate/3]).
--record (state,{sender_pid}).
+-record (state,{sender_pid,tab,target}).
 
 init(Req, _State) ->
-        %gproc:reg({p, l, my_event_proc}),
+	Table = ets:new(?MODULE,[]),
 	process_flag(trap_exit, true),
+
        <<X:64/big-unsigned-integer>> = crypto:strong_rand_bytes(8),
-       Random = lists:flatten(io_lib:format("~16.16.0b", [X])), %32=field width, Pad de zero, b est le Mod
-       Target = list_to_binary(Random++"@mail-testing.com"),
+       _Random = lists:flatten(io_lib:format("~16.16.0b", [X])), %32=field width, Pad de zero, b est le Mod
+       Target = list_to_binary(_Random++"@mail-testing.com"),
+       %Target = list_to_binary("azerty51@mail-testing.com"),
         io:format("eventsource_h le email en random ~p ~n",[Target]),
+        gproc:reg({p, l, Target}),
 
         turtle:publish(my_publisher,
                 <<"pipe_cowboy">>,
                 <<"">>,
                 <<"text/json">>,
                 Target,
-		%<<"seb@mail-testing.com">>,
                 #{ delivery_mode => persistent }),
 
-        gproc:reg({p, l, Target}),
-	
-        %{ok, SenderPid} = gen_consume:start_link(Target),
-        %gen_consume:start(Target),
-        {ok, _SenderPid} = gen_consume:start(Target),
+  	ets:insert(Table, {Target,30}),
+
+        {ok, _SenderPid} = gen_consume:start_link(Target),
 
 	Req0 = cowboy_req:stream_reply(200, #{
 		<<"content-type">> => <<"text/event-stream">>
 	}, Req),
 	%erlang:send_after(1000, self(), {message, <<"seb@mail-testing.com">>, []}),
 	erlang:send_after(1000, self(), {message, Target, []}),
-	State2 = #state{sender_pid=_SenderPid},
+	State2 = #state{sender_pid=_SenderPid,tab=Table,target=Target},
 	{cowboy_loop, Req0, State2}.
 
 info({message, Msg,[]}, Req, State)  ->
+	Table = State#state.tab,
+	Target = State#state.target,
+	%Target2 = list_to_binary("azerty51@mail-testing.com"),
+	Counter = case ets:lookup(Table, Target) of
+			[{Target,Balance}] -> _NewBalance = Balance - 1
+	end,
+	%io:format("eventsource_h Target ~p ~n",[Target2]),
+	ets:insert(Table, {Target, Counter}),
+
 	cowboy_req:stream_events(#{
 		id => id(),
-		data => Msg
+		%data => Msg
+		data =>  integer_to_list(Counter)
 	}, nofin, Req),
 	erlang:send_after(1000, self(), {message,Msg,[]}),
 	{ok, Req, State};
@@ -71,5 +81,5 @@ terminate(_Reason, _Req, #state{sender_pid=_SenderPid}=_State) ->
 	io:format("eventsource_h terminate SenderPid ~p ~n",[_SenderPid]),
 	io:format("eventsource_h terminate Reason ~p ~n",[_Reason]),
 	io:format("eventsource_h terminate Req ~p ~n",[_Req]),
-  % 	gen_server:cast(_SenderPid, {_AdresseDeMerde,[]}),
+% 	gen_server:cast(_SenderPid, {_AdresseDeMerde,[]}),
 	    ok.
