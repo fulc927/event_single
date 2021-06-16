@@ -17,12 +17,6 @@ positive_fun(forward, _) ->
 
 
 start(_Type, _Args) ->
-    <<X:64/big-unsigned-integer>> = crypto:strong_rand_bytes(8),
-    _Random = lists:flatten(io_lib:format("~16.16.0b", [X])), %32=field width, Pad de zero, b est le Mod
-    %Target = _Random++"@mail-testing.com",
-    Target = list_to_binary(_Random++"@mail-testing.com"),
-    io:format("event_single_app Random ~p ~n",[Target]),
-    
     IdConstraints = { id, [int, fun positive_fun/2] },
 
     IdRoute = {"/results/:id",
@@ -37,8 +31,8 @@ start(_Type, _Args) ->
     Dispatch = cowboy_router:compile([
         {"mail-testing.com", [
 	       %{"/", cowboy_static, {priv_file, event_single, "index.html"}},
-		{"/", cowboy_dyn, [Target]},
-	       {"/eventsource", eventsource_h, [Target]},
+		{"/", cowboy_dyn, []},
+	       {"/eventsource", eventsource_h, []},
 	       IdRoute,
 	       CatchallRoute
 	]}

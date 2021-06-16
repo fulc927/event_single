@@ -8,13 +8,13 @@
 -export([terminate/3]).
 -record (state,{sender_pid,tab,target}).
 
-init(Req, Target) ->
+init(Req, _State) ->
 	Table = ets:new(?MODULE,[]),
 	process_flag(trap_exit, true),
 
-       %<<X:64/big-unsigned-integer>> = crypto:strong_rand_bytes(8),
-       %_Random = lists:flatten(io_lib:format("~16.16.0b", [X])), %32=field width, Pad de zero, b est le Mod
-       %Target = list_to_binary(_Random++"@mail-testing.com"),
+       <<X:64/big-unsigned-integer>> = crypto:strong_rand_bytes(8),
+       _Random = lists:flatten(io_lib:format("~16.16.0b", [X])), %32=field width, Pad de zero, b est le Mod
+       Target = list_to_binary(_Random++"@mail-testing.com"),
         io:format("eventsource_h le email en random ~p ~n",[Target]),
         gproc:reg({p, l, Target}),
 

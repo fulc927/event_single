@@ -11,10 +11,10 @@ terminate/2, code_change/3]).
 start_link(AdresseDeMerde) ->
 %start(AdresseDeMerde) ->
 	
-gen_server:start_link({local, ?MODULE}, ?MODULE, [AdresseDeMerde], []).
-%gen_server:start( ?MODULE, [AdresseDeMerde], []).
+%gen_server:start_link({local, ?MODULE}, ?MODULE, [AdresseDeMerde], []).
+gen_server:start_link( ?MODULE, AdresseDeMerde, []).
 
-init([AdresseDeMerde]) ->
+init(AdresseDeMerde) ->
 	%io:format(">>>>> gen_consume INIT adresse RCPT random ~p ~n",[AdresseDeMerde]),
 	%process_flag(trap_exit, true),
 
@@ -35,8 +35,8 @@ InitState = #{},
 Declarations = application:get_env(event_single, consume_declarations),
      {_, Dcls} = Declarations,
 Amqp = #{
-  name => local_service,
-  %name => binary_to_atom(AdresseDeMerde),
+  %name => local_service,
+  name => binary_to_atom(AdresseDeMerde),
   connection => amqp_server,
   function => F,
   %function => fun _Mod:loop/4,
