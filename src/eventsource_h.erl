@@ -16,6 +16,7 @@ init(Req, _State) ->
        _Random = lists:flatten(io_lib:format("~16.16.0b", [X])), %32=field width, Pad de zero, b est le Mod
        Target = list_to_binary(_Random++"@mail-testing.com"),
         io:format("eventsource_h le email en random ~p ~n",[Target]),
+
         gproc:reg({p, l, Target}),
 
         turtle:publish(my_publisher,
@@ -26,18 +27,12 @@ init(Req, _State) ->
                 #{ delivery_mode => persistent }),
 
   	ets:insert(Table, {Target,30}),
-	io:format("eventsource après le turtle:pulbsish ~n"),
         {ok, _SenderPid} = gen_consume:start_link(Target),
-	io:format("eventsource après le gen_consume launch ~n"),
 
 	Req0 = cowboy_req:stream_reply(200, #{
 		<<"content-type">> => <<"text/event-stream">>
 	}, Req),
-	io:format("eventsource après le stream_reply 200 ~n"),
 
-	%cowboy_req:stream_body("Hello\r\n", nofin, Req),
-	io:format("eventsource après le cowboy_req_stream"),
-	
 	erlang:send_after(1000, self(), {message, Target, []}),
 	State2 = #state{sender_pid=_SenderPid,tab=Table,target=Target},
 	{cowboy_loop, Req0, State2}.

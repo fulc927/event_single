@@ -9,13 +9,9 @@ init(Req, _State) ->
 	Self = self(),
         {ok, QBook} = gen_server:call(frequency, {allocate, Self}),
         {ok, _SenderPid} = gen_consume_score:start({Id,QBook}),
-    %cowboy_req:reply(200, #{<<"content-type">> => <<"text/plain">>}, [], Req),
 	io:format("gen_consume_score QBook ~p ~n",[QBook]),
-	%io:format("hello_handler Req ~p ~n",[Req]),
 	io:format("hello_handler init STATE ~p ~n",[_State]),
        gproc:reg({p, l, Id}),
-       %gproc:reg({p, l, my_event_proc2}),
-    %{ok, Req, State}.
     State2 = #state{sender_pid=_SenderPid,booked_queue=QBook},
     {cowboy_loop, Req, State2,hibernate}.
 
