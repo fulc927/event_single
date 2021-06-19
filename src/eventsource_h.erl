@@ -10,11 +10,14 @@
 
 init(Req, _State) ->
 	Table = ets:new(?MODULE,[]),
-	process_flag(trap_exit, true),
+	
+	%process_flag(trap_exit, true),
 
-       <<X:64/big-unsigned-integer>> = crypto:strong_rand_bytes(8),
-       _Random = lists:flatten(io_lib:format("~16.16.0b", [X])), %32=field width, Pad de zero, b est le Mod
-       Target = list_to_binary(_Random++"@mail-testing.com"),
+	[{{{_,_,_,_},_},Target}] = gen_server:call(store_and_dispatch, {query,{{82,64,230,35},53712}}), 
+%	{{{82,64,230,35},53712},<<"6ba11a0aab00131e@mail-testing.com">>}	  
+       %<<X:64/big-unsigned-integer>> = crypto:strong_rand_bytes(8),
+       %_Random = lists:flatten(io_lib:format("~16.16.0b", [X])), %32=field width, Pad de zero, b est le Mod
+       %Target = list_to_binary(_Random++"@mail-testing.com"),
         io:format("eventsource_h le email en random ~p ~n",[Target]),
 
         gproc:reg({p, l, Target}),
@@ -75,10 +78,10 @@ id() ->
 	integer_to_list(erlang:unique_integer([positive, monotonic]), 16).
 
 
-terminate(_Reason, _Req, #state{sender_pid=_SenderPid}=_State) ->
+%terminate(_Reason, _Req, #state{sender_pid=_SenderPid}=_State) ->
+terminate(Reason, Req, State) ->
 	%timer:sleep(3000),
-	io:format("eventsource_h terminate SenderPid ~p ~n",[_SenderPid]),
-	io:format("eventsource_h terminate Reason ~p ~n",[_Reason]),
-	io:format("eventsource_h terminate Req ~p ~n",[_Req]),
-% 	gen_server:cast(_SenderPid, {_AdresseDeMerde,[]}),
+	io:format("eventsource_h terminate Reason ~p ~n",[Reason]),
+	io:format("eventsource_h terminate Req ~p ~n",[Req]),
+	io:format("eventsource_h terminate Req ~p ~n",[State]),
 	    ok.

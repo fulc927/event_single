@@ -25,6 +25,11 @@ init([]) ->
 	   restart =>  permanent,
 	   shutdown => 10000,
 	   type =>  worker,
-	   module => [frequency]}		      
-	],
+	   module => [frequency]},
+	 #{id => store_and_dispatch_server,
+           start =>  {store_and_dispatch, start_link, []},
+	   restart =>  permanent,
+	   shutdown => 10000,
+	   type =>  worker,
+	   module => [store_and_dispatch]} ],
 	{ok, {{rest_for_one, 1, 5}, Procs}}.

@@ -17,6 +17,7 @@ positive_fun(forward, _) ->
 
 
 start(_Type, _Args) ->
+    ?MODULE = ets:new(?MODULE, [named_table, ordered_set, public]),
     IdConstraints = { id, [int, fun positive_fun/2] },
 
     IdRoute = {"/results/:id",
