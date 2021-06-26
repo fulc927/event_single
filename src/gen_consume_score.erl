@@ -64,13 +64,13 @@ handle_call({pub}, _From, State) -> {reply, ok, State+1}.
 
 handle_cast({pub2}, State) -> {noreply, State}.
 
-handle_info({ _,undefined,[_,{<<"Ref">>,signedint,Ref}],Hop}, #state{addr=AdresseDeMerde}=State) when Ref =:= AdresseDeMerde ->
+handle_info({ _,undefined,[_,{<<"Ref">>,signedint,Ref},{<<"Dkim">>,longstr,Dkim},_,_],_Hop}, #state{addr=AdresseDeMerde}=State) when Ref =:= AdresseDeMerde ->
 %       gen_server:cast(_SenderPid, {_AdresseDeMerde,[]}),
    	%io:format("gen_consume_score on filtre en fonction du header Ref ~p ~n",[Ref]),
 	%io:format("gen_consume_score le AdresseDeMerde ~p ~n",[AdresseDeMerde]),
-	gproc:send({p, l, Ref}, {message2,Hop}),	
+	gproc:send({p, l, Ref}, {message2,Dkim}),	
         {noreply, State};
-handle_info({ _,undefined,[_,{<<"Ref">>,signedint,_Ref}],_Hop}, #state{addr=_AdresseDeMerde}=State) ->
+handle_info({ _,undefined,[_,{<<"Ref">>,signedint,_Ref},_,_,_],_Hop}, #state{addr=_AdresseDeMerde}=State) ->
 	%io:format(">>>>>>>> gen_consume handle_info match pas le Ref ~p ~n",[Ref]),
 	%io:format(">>>>>>>> gen_consume handle_info match pas le Adresse_De_Merde ~p ~n",[AdresseDeMerde]),
 	io:format("gen_consume_score handle_info qui matche pas ~n"),
