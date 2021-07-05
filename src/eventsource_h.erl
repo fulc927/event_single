@@ -10,6 +10,7 @@
 
 init(Req, _State) ->
 	Table = ets:new(?MODULE,[]),
+        io:format("eventsource_h State ~p ~n",[_State]),
 	
 	%process_flag(trap_exit, true),
 

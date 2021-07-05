@@ -15,13 +15,14 @@ init(Req, _State) ->
     State2 = #state{sender_pid=_SenderPid,booked_queue=QBook},
     {cowboy_loop, Req, State2,hibernate}.
 
-info({message2, Dkim}, Req, #state{sender_pid=SenderPid,booked_queue=_QBook}=State) ->
+info({message2, Date, Dkim,_Dkim_valid}, Req, #state{sender_pid=SenderPid,booked_queue=_QBook}=State) ->
 	io:format("hello_handler INFO/3 Hop ~p ~n",[Dkim]),
 	%io:format("hello_handler INFO/3 Req ~p ~n",[Req]),
 	io:format("hello_handler LA PAGE HTML S AFFICHE ! ~n"),
         gen_server:cast(frequency,{deallocate, _QBook}),
 
 	_Title = "le titre",
+	Ipv6 = "l adresse ipv6",
 	%Body = "le body",
         cowboy_req:reply(200, #{<<"content-type">> => <<"text/html">>}, 
 			 
@@ -55,11 +56,20 @@ info({message2, Dkim}, Req, #state{sender_pid=SenderPid,booked_queue=_QBook}=Sta
     	margin: 25px 0;
   	}
 	}
-
+        pre {
+    	white-space: pre-wrap;       /* Since CSS 2.1 */
+    	white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+    	white-space: -pre-wrap;      /* Opera 4-6 */
+    	white-space: -o-pre-wrap;    /* Opera 7 */
+    	word-wrap: break-word;       /* Internet Explorer 5.5+ */
+	} 
 	body {
-    	font-size: 150%;
+    	font-size: 150%; 
     	font-family: muli,avenir,helvetica neue,helvetica,ubuntu,roboto,noto,segoe ui,arial,sans-serif;
      	}
+	#cont {display: none; }
+           .show:focus + .hide {display: inline; }
+           .show:focus + .hide + #cont {display: block;}
     </style>
 
     </head>
@@ -84,8 +94,14 @@ info({message2, Dkim}, Req, #state{sender_pid=SenderPid,booked_queue=_QBook}=Sta
 
  <h1 style=\"text-align:center\">Results</h1>
 
+<pre style=\"width:100%;color:#f8f8f2;background-color:#272822\">",Date,"</pre>
 
-<div><pre style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4\"><code class=\"language-html\" data-lang=\"html\">",Dkim,"</code></pre></div>
+<pre style=\"width:100%;color:#f8f8f2;background-color:#272822\">",Ipv6,"</pre>
+
+<pre style=\"width:100%;color:#f8f8f2;background-color:#272822\">",Dkim,"</pre>
+	<div> <a style=\"float: right;\" href=\"#show\"class=\"show\">[Show]</a>
+              <a style=\"float: right;\" href=\"#hide\"class=\"hide\">[Hide]</a>
+        <div id=\"cont\">Content uiestaunre auinetau tuins t ausnetaunr t tunsetaunrestaun tn ausrnteanute t  tsrntenauiet tn  nrusteanr tarnet narut  netaunrs etaurnet n nrest t  t     srnetaunretanuet      anretaunretanuetan t</div>  </div>
 
 <p><a href=\"#\">Back to top</a></p>
 
