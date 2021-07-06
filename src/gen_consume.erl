@@ -59,10 +59,10 @@ handle_call({pub}, _From, State) -> 	{reply, ok, State+1}.
 
 handle_cast({pub2}, State) -> {noreply, State}.
 
-handle_info({ _,undefined,[{<<"To">>,longstr,_RdmAddress},{<<"Ref">>,signedint,Ref},{<<"Dkim">>,longstr,Dkim},{<<"Date">>,longstr,_Date},{<<"SPF_PASS">>,signedint,_},{<<"EMPTY_MESSAGE">>,signedint,_},{<<"DKIM_VALID">>,signedint,_}],_Hop}=_Unroll, #state{addr=AdresseDeMerde,booked_queue=QBook}=State) when _RdmAddress =:= AdresseDeMerde  -> 
+%handle_info({ _,undefined,[{<<"To">>,longstr,_RdmAddress},{<<"Ref">>,signedint,Ref},{<<"Dkim">>,longstr,Dkim},{<<"Date">>,longstr,_Date},{<<"Ip">>,longstr,Ip},{<<"Serveur">>,longstr,Serveur},{<<"SPF_PASS">>,signedint,Spf_pass},{<<"EMPTY_MESSAGE">>,signedint,_},{<<"DKIM_VALID">>,signedint,Dkim_valid}],_Hop}=_Unroll, #state{addr=AdresseDeMerde,booked_queue=QBook}=State) when _RdmAddress =:= AdresseDeMerde  -> 
+handle_info({ _,undefined,[{<<"To">>,longstr,_RdmAddress},{<<"Ref">>,signedint,Ref},_,_,_,_,_,_,_],_Hop}=_Unroll, #state{addr=AdresseDeMerde,booked_queue=QBook}=State) when _RdmAddress =:= AdresseDeMerde  -> 
 	%io:format("gen_consume Tout le pkt AMQP ~p ~n",[Unroll]),
    	%io:format("gen_consume on filtre en fonction du header To GPROC SEND ~p ~n",[AdresseDeMerde]),
-	io:format("gen_consume Dkim ~p ~n",[Dkim]),
 	io:format("gen_consume HANDLE_INFO/3 freq ~p ~n",[QBook]),
 	io:format("gen_consume HANDLE_INFO/3 Hop ~p ~n",[_Hop]),
         gproc:send({p, l, AdresseDeMerde}, {error,Ref,42}),	
@@ -70,7 +70,7 @@ handle_info({ _,undefined,[{<<"To">>,longstr,_RdmAddress},{<<"Ref">>,signedint,R
         gen_server:cast(frequency,{deallocate, QBook}),
 	{noreply, State};
 
-handle_info({ _,undefined,[{<<"To">>,longstr,Fuck},_,_,_,_,_,_],_Hop},#state{addr=AdresseDeMerde}=State) -> 
+handle_info({ _,undefined,[{<<"To">>,longstr,Fuck},_,_,_,_,_,_,_,_],_Hop},#state{addr=AdresseDeMerde}=State) -> 
 	io:format(">>>>>>>> gen_consume handle_info match pas le Fuck ~p ~n",[Fuck]),
 	io:format("gen_consume HANDLE_INFO/3 Hop ~p ~n",[_Hop]),
 	io:format(">>>>>>>> gen_consume handle_info match pas le Adresse_De_Merde ~p ~n",[AdresseDeMerde]),

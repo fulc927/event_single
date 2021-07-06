@@ -17,23 +17,25 @@ positive_fun(forward, _) ->
 
 
 start(_Type, _Args) ->
+    %le nom de la table servant a transférer les couples ip/ports est event_single_app ?MODULE
     ?MODULE = ets:new(?MODULE, [named_table, ordered_set, public]),
-    IdConstraints = { id, [int, fun positive_fun/2] },
 
-    IdRoute = {"/results/:id",
+    IdConstraints = { id, [int, fun positive_fun/2] },
+    IdRoute =   {"/results/:id",
                  [IdConstraints],
-                 hello_handler,
+                 results_handler,
                  []
-              }, %The last arg becomes the State
-                 %arg in the id_handler's init() method.
+                },
+   		 %The last arg becomes the State arg in the id_handler's init() method.
 
     CatchallRoute = {"/[...]", no_matching_route_handler, []},
 
     Dispatch = cowboy_router:compile([
         {"mail-testing.com", [
 	       %{"/", cowboy_static, {priv_file, event_single, "index.html"}},
-		{"/", cowboy_dyn, []},
-	       {"/eventsource", eventsource_h, []},
+		{"/", welcome_page, []},
+	        {"/eventsource", eventsource_h, []},
+	        {"/home", home, {priv_file, event_single, "index.html"}},
 	       IdRoute,
 	       CatchallRoute
 	]}

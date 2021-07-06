@@ -12,7 +12,6 @@ start() ->
   gen_server:start({local, frequency}, frequency, [], []).
 
 init([]) ->
-  %gproc:reg({p, l, my_frequency_proc}),
   Frequencies = {get_frequencies(), []},
   {ok, Frequencies}.
 

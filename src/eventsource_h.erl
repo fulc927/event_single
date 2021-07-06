@@ -31,7 +31,7 @@ init(Req, _State) ->
                 Target,
                 #{ delivery_mode => persistent }),
 
-  	ets:insert(Table, {Target,51}),
+  	ets:insert(Table, {Target,59}),
         {ok, _SenderPid} = gen_consume:start_link(Target),
 
 	Req0 = cowboy_req:stream_reply(200, #{
