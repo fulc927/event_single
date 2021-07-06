@@ -6,20 +6,20 @@
 
 init(Req0, State) ->
 	
+	%cowboy_dyn Req0 {{93,22,148,15},52793}
 	#{peer := IdCouple} = Req0,
-	io:format("cowboy_dyn Req0 ~p ~n",[IdCouple]),
+	io:format("cowboy_dyn IdCouple ~p ~n",[IdCouple]),
   	<<X:64/big-unsigned-integer>> = crypto:strong_rand_bytes(8),
         _Random = lists:flatten(io_lib:format("~16.16.0b", [X])), %32=field width, Pad de zero, b est le Mod
         Target = list_to_binary(_Random++"@mail-testing.com"),
         io:format("cowboy_dyn le email en random ~p ~n",[Target]),
 
-        D = gen_server:cast(store_and_dispatch, {randomstring,{{82,64,230,35},53712},Target}),
+        D = gen_server:cast(store_and_dispatch, {randomstring,IdCouple,Target}),
 	io:format("cowboy_dyn store ~p ~n",[D]),
-        E = gen_server:call(store_and_dispatch, {query,{{82,64,230,35},53712}}), 
+        E = gen_server:call(store_and_dispatch, {query,IdCouple}), 
 	io:format("cowboy_dyn lookup ~p ~n",[E]),
 
 
-        %_D = gen_server:call(store_and_dispatch, {query,{{82,64,230,35},53712}}), 
 	
 	%gproc:reg({p, l, cowboy_dyn}),
 

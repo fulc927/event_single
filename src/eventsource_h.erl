@@ -13,9 +13,10 @@ init(Req, _State) ->
         io:format("eventsource_h State ~p ~n",[_State]),
 	
 	%process_flag(trap_exit, true),
+	#{peer := IdCouple} = Req,
+	io:format("eventsource_h IdCouple ~p ~n",[IdCouple]),
 
-	[{{{_,_,_,_},_},Target}] = gen_server:call(store_and_dispatch, {query,{{82,64,230,35},53712}}), 
-%	{{{82,64,230,35},53712},<<"6ba11a0aab00131e@mail-testing.com">>}	  
+	[{{{_,_,_,_},_},Target}] = gen_server:call(store_and_dispatch, {query,IdCouple}), 
        %<<X:64/big-unsigned-integer>> = crypto:strong_rand_bytes(8),
        %_Random = lists:flatten(io_lib:format("~16.16.0b", [X])), %32=field width, Pad de zero, b est le Mod
        %Target = list_to_binary(_Random++"@mail-testing.com"),
@@ -30,7 +31,7 @@ init(Req, _State) ->
                 Target,
                 #{ delivery_mode => persistent }),
 
-  	ets:insert(Table, {Target,30}),
+  	ets:insert(Table, {Target,51}),
         {ok, _SenderPid} = gen_consume:start_link(Target),
 
 	Req0 = cowboy_req:stream_reply(200, #{
