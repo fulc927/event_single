@@ -35,7 +35,7 @@ start(_Type, _Args) ->
 	       %{"/", cowboy_static, {priv_file, event_single, "index.html"}},
 		{"/", welcome_page, []},
 	        {"/eventsource", eventsource_h, []},
-	        {"/home", home, {priv_file, event_single, "index.html"}},
+	        {"/home", cowboy_static, {priv_file, event_single, "index.html"}},
 	       IdRoute,
 	       CatchallRoute
 	]}
