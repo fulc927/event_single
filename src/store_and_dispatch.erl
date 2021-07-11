@@ -14,9 +14,8 @@ init([]) ->
  State  = [],
   {ok, State}.
 
-handle_cast({randomstring,{{A,B,C,D},E}=Couple,Target},State) ->
+handle_cast({insert,{{A,B,C,D},E}=Couple,Target},State) ->
   	ets:insert(event_single_app, {Couple,Target}),
-  	io:format("store_and_dispatch Couple ~p ~n",[Couple]),
   	io:format("store_and_dispatch Ip and Target ~p ~p ~p ~p ~p ~p ~n",[A,B,C,D,E,Target]),
   {noreply, State}.
 
@@ -40,22 +39,3 @@ terminate(_Reason, _LoopData) ->
 
 code_change(_OldVsn, State, _Extra) ->
   {ok, State}.
-
-
-
-
-%%% client api
-
-%allocate() -> gen_server:call(frequency, {allocate, self()}).
-
-%deallocate(Frequency) -> gen_server:cast(frequency, {deallocate, Frequency}).
-
-% How to use
-%
-%
-%c(frequency).
-%gen_server:start({local, frequency}, frequency, [], []).
-%
-% frequency:allocate().
-%
-% frequency:deallocate(10).

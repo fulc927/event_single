@@ -18,9 +18,9 @@ init([]) ->
 get_frequencies() -> ["queue1", "queue2", "queue3","queue4"].
 
 handle_call({allocate, Pid}, _From, Frequencies) ->
-  %io:format("frequency handle_call/3 delivre une frequence ~p ~n",[Frequencies]),
+  io:format("frequency handle_call/3 allocate Frequencies ~p & Pid ~p ~n",[Frequencies,Pid]),
   {NewFrequencies, Reply} = allocate(Frequencies, Pid),
-  io:format("frequency handle_call/3 freq attribue Reply ~p ~n",[Reply]),
+  io:format("frequency handle_call/3 attribue queue et repond a elcome ~p ~n",[Reply]),
   {reply, Reply, NewFrequencies}.
 
 handle_cast({deallocate, Freq}, Frequencies) ->

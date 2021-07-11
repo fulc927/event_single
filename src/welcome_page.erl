@@ -14,7 +14,7 @@ init(Req0, State) ->
         Target = list_to_binary(_Random++"@mail-testing.com"),
         io:format("welcome_page le email en random ~p ~n",[Target]),
 
-        D = gen_server:cast(store_and_dispatch, {randomstring,IdCouple,Target}),
+        D = gen_server:cast(store_and_dispatch, {insert,IdCouple,Target}),
 	io:format("welcome_page store ~p ~n",[D]),
         E = gen_server:call(store_and_dispatch, {query,IdCouple}), 
 	io:format("welcome_page lookup ~p ~n",[E]),

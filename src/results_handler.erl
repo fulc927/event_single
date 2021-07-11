@@ -5,12 +5,16 @@
 -record( state, { sender_pid,booked_queue}).
 
 init(Req, _State) ->
+	%welcome_page Req0 {{93,22,148,15},52793}
+	#{peer := IdCouple} = Req,
+	io:format("result_handlers IdCouple ~p ~n",[IdCouple]),
+
 	Id = cowboy_req:binding(id, Req),
 	%results_handler Id 12213958
 	Self = self(),
         {ok, QBook} = gen_server:call(frequency, {allocate, Self}),
         {ok, _SenderPid} = gen_consume_results:start({Id,QBook}),
-	io:format("gen_consume_results QBook ~p ~n",[QBook]),
+	io:format("results_handler QBook ~p ~n",[QBook]),
 	io:format("results_handler init STATE ~p ~n",[_State]),
 	%on register avec le binding qui vient du httpc call
         gproc:reg({p, l, Id}),
@@ -18,8 +22,6 @@ init(Req, _State) ->
     {cowboy_loop, Req, State2,hibernate}.
 
 info({results_page, Dkim, Date, Ip, Serveur,Dkim_valid,Payload}, Req, #state{sender_pid=SenderPid,booked_queue=_QBook}=State) ->
-	io:format("results_handler INFO/3 Hop ~p ~n",[Dkim]),
-	%io:format("results_handler INFO/3 Req ~p ~n",[Req]),
 	io:format("results_handler LA PAGE HTML S AFFICHE ! ~n"),
         gen_server:cast(frequency,{deallocate, _QBook}),
 

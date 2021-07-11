@@ -22,8 +22,6 @@ init({AdresseDeMerde,_QBook}) ->
 	io:format("gen_consume_results ~p ~n",[_QBook]),
 	Self = self(),
 
-        %{ok, QBook} = gen_server:call(frequency, {allocate, Self}),
-
 	G = fun(Key, ContentType, Payload, Header, _State) ->
 		io:format("gen_consume_results la on recup les header depuis la queue RabbitMQ  ~n"),
 		Self ! {Key, ContentType, Header, Payload},
