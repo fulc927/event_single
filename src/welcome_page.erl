@@ -6,22 +6,23 @@
 
 init(Req0, State) ->
 	
+	%enregistrement du couple IP/NAT du navigateur client
 	%welcome_page Req0 {{93,22,148,15},52793}
 	#{peer := IdCouple} = Req0,
 	io:format("welcome_page IdCouple ~p ~n",[IdCouple]),
+
+	%Création de l'adresse random
   	<<X:64/big-unsigned-integer>> = crypto:strong_rand_bytes(8),
         _Random = lists:flatten(io_lib:format("~16.16.0b", [X])), %32=field width, Pad de zero, b est le Mod
         Target = list_to_binary(_Random++"@mail-testing.com"),
         io:format("welcome_page le email en random ~p ~n",[Target]),
 
-        D = gen_server:cast(store_and_dispatch, {insert,IdCouple,Target}),
-	io:format("welcome_page store ~p ~n",[D]),
+	%opérations ETS
+        gen_server:cast(store_and_dispatch, {insert,IdCouple,Target}),
         E = gen_server:call(store_and_dispatch, {query,IdCouple}), 
 	io:format("welcome_page lookup ~p ~n",[E]),
 
-	%Req = cowboy_req:reply(200,
-	%cowboy_req:stream_body(["<html><head><title>","Hello world!","</title><script>",Script,"</script></head>","<body><p>",Body,"<div id=\"status\"></div>",State,"</p></body></html>"], nofin, Req0),
-	
+	%Script JAVASCRIPT pour le WSS
 	Script = "<script>function ready() {if (!!window.EventSource) { setupEventSource(); } else { document.getElementById(\"status\").innerHTML = \"Sorry but your browser doesn t support the EventSource API\"; } } function setupEventSource() { var source = new EventSource(\"/eventsource\"); source.addEventListener('message', function(event) { addStatus(event.data); Y = event.data; console.log(Y); }, false); source.addEventListener(\"open\", function(event) { }, false); source.addEventListener(\"error\", function(event) { console.log(Y); location.replace(\"http://mail-testing.com/results/\" + Y); if (event.eventPhase == EventSource.CLOSED) { } }, false); } function addStatus(text) { document.getElementById(\"status\").innerHTML=text + \" secs\"; }</script>",
 	Req = cowboy_req:stream_reply(200, #{<<"content-type">> => <<"text/html">>}, Req0),
 	timer:sleep(1000),
@@ -50,7 +51,7 @@ init(Req0, State) ->
 
     </head>
 
-<body>
+<body onload=\"ready();\">
     <div style=\"overflow: hidden;\">
   <!-- <p style=\"float: left;\"><a href=\"#nav-menu\">Menu</a></p> 
   <p style=\"float: right;\"><a\"><strong>Menu du site</strong></a></p> -->
@@ -73,7 +74,7 @@ init(Req0, State) ->
 
 		
   <div> <div style=\"text-align:center\">",Target,"</div>
-<div style=\"text-align:center\"><button onclick=\"ready();\"> Lancer le test </button> </div>
+<!--<div style=\"text-align:center\"><button onclick=\"ready();\"> Lancer le test </button> </div>  -->
 <div style=\"text-align:center\" id=\"status\"></div>
 </body>
 

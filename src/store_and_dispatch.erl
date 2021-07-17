@@ -23,6 +23,7 @@ handle_call({query,{{A,B,C,D},E}=Couple}, _From, State) ->
 	io:format("store_and_dispatch query Couple ~p ~n",[Couple]),
 	Reply = ets:lookup(event_single_app, {{A,B,C,D},E}), 
 	io:format("store_and_dispatch Reply ~p ~n",[Reply]),
+	% TEST NÉCESSAIRE À CE NIVEAU !!! si Reply = []
 {reply, Reply, State}.
 
 

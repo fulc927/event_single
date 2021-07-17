@@ -8,6 +8,17 @@
 -export([terminate/3]).
 -record (state,{sender_pid,tab,target}).
 
+emptycouple(IdCouple) ->
+	%	[{{{82,64,230,35},19026},<<"f69dfba6ba5c5fe9@mail-testing.com">>}]
+	   If = case gen_server:call(store_and_dispatch, {query,IdCouple}) of
+	            [] ->
+		               <<"badstart">>;
+	            _ ->
+		               [{{{_,_,_,_},_},Target}] = gen_server:call(store_and_dispatch, {query,IdCouple}),
+			       Target 
+		end,
+{If}.
+
 init(Req, _State) ->
 	Table = ets:new(?MODULE,[]),
         io:format("eventsource_h State ~p ~n",[_State]),
@@ -15,9 +26,12 @@ init(Req, _State) ->
 	%process_flag(trap_exit, true),
 	#{peer := IdCouple} = Req,
 	io:format("eventsource_h IdCouple ~p ~n",[IdCouple]),
-
-	[{{{_,_,_,_},_},Target}] = gen_server:call(store_and_dispatch, {query,IdCouple}), 
-       %<<X:64/big-unsigned-integer>> = crypto:strong_rand_bytes(8),
+	{Target} = emptycouple(IdCouple),
+	
+	%A = gen_server:call(store_and_dispatch, {query,IdCouple}), 
+       
+	
+	%<<X:64/big-unsigned-integer>> = crypto:strong_rand_bytes(8),
        %_Random = lists:flatten(io_lib:format("~16.16.0b", [X])), %32=field width, Pad de zero, b est le Mod
        %Target = list_to_binary(_Random++"@mail-testing.com"),
         io:format("eventsource_h le email en random ~p ~n",[Target]),
@@ -32,7 +46,7 @@ init(Req, _State) ->
                 #{ delivery_mode => persistent }),
 
   	ets:insert(Table, {Target,59}),
-        {ok, _SenderPid} = gen_consume:start_link(Target),
+        {ok, _SenderPid} = gen_consume:start(Target),
 
 	Req0 = cowboy_req:stream_reply(200, #{
 		<<"content-type">> => <<"text/event-stream">>
@@ -73,16 +87,13 @@ info({error,Ref,MM}, Req, #state{sender_pid=_SenderPid}=State) when MM =:= 42  -
 	         id => id(),
 		 data => integer_to_list(Ref)
 		}, fin, Req),
-	%{ok, Req1, State}.
 	gen_server:stop(_SenderPid),
 	{stop, Req1, State}.
 id() ->
 	integer_to_list(erlang:unique_integer([positive, monotonic]), 16).
 
 
-%terminate(_Reason, _Req, #state{sender_pid=_SenderPid}=_State) ->
 terminate(Reason, Req, State) ->
-	%timer:sleep(3000),
 	io:format("eventsource_h terminate Reason ~p ~n",[Reason]),
 	io:format("eventsource_h terminate Req ~p ~n",[Req]),
 	io:format("eventsource_h terminate Req ~p ~n",[State]),

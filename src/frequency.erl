@@ -12,21 +12,47 @@ start() ->
   gen_server:start({local, frequency}, frequency, [], []).
 
 init([]) ->
+
   Frequencies = {get_frequencies(), []},
-  {ok, Frequencies}.
+  Frequencies2 = {get_frequencies2(), []},
+  Debug = superandom(Frequencies),
+  io:format("frequency Debug ~p ~n",[Debug]),
+  {ok, {Frequencies,Frequencies2}}.
 
-get_frequencies() -> ["queue1", "queue2", "queue3","queue4"].
+superandom(List_freq) ->
+ io:format("frequency superandom  List_freq ~p ~n",[List_freq]),
+	{A,B} = List_freq,
+ io:format("frequency superandom  A ~p ~n",[A]),
+C = [X ||{_,X} <- lists:sort([ {rand:uniform(), N} || N <- A])],
+ io:format("frequency superandom  C ~p ~n",[C]),
+D = {C,B},
+D.
 
-handle_call({allocate, Pid}, _From, Frequencies) ->
-  io:format("frequency handle_call/3 allocate Frequencies ~p & Pid ~p ~n",[Frequencies,Pid]),
-  {NewFrequencies, Reply} = allocate(Frequencies, Pid),
-  io:format("frequency handle_call/3 attribue queue et repond a elcome ~p ~n",[Reply]),
-  {reply, Reply, NewFrequencies}.
 
-handle_cast({deallocate, Freq}, Frequencies) ->
-  io:format("frequency handle_cast/2 desalloue frequence ~p ~n",[Freq]),
+
+get_frequencies() -> ["queue0","queue1", "queue2","queue3","queue4"].
+get_frequencies2() -> ["queue5","queue6", "queue7","queue8","queue9"].
+
+handle_call({allocate, Pid}, _From, {Frequencies,F2}) ->
+  io:format("frequency handle_call/3 allocate Frequencies ~p ~n",[Frequencies]),
+  {NewFrequencies, Reply} = allocate(superandom(Frequencies), Pid),
+  io:format("frequency handle_call/3 Reply ~p ~n",[Reply]),
+  {reply, Reply, {NewFrequencies,F2}};
+handle_call({allocate2, Pid}, _From, {F,Frequencies2}) ->
+  io:format("frequency handle_call/3 allocate Frequencies2 ~p ~n",[Frequencies2]),
+  {NewFrequencies2, Reply} = allocate(superandom(Frequencies2), Pid),
+  io:format("frequency handle_call/3 Reply2 ~p ~n",[Reply]),
+  {reply, Reply, {F,NewFrequencies2}}.
+
+handle_cast({deallocate, Freq}, {Frequencies,F2}) ->
+  io:format("frequency handle_cast/2 deallocate frequence ~p ~n",[Freq]),
   NewFrequencies = deallocate(Frequencies, Freq),
-  {noreply, NewFrequencies};
+  {noreply, {NewFrequencies,F2}};
+
+handle_cast({deallocate2, Freq}, {F,Frequencies2}) ->
+  io:format("frequency handle_cast/2 desalloue frequence2 ~p ~n",[Freq]),
+  NewFrequencies2 = deallocate(Frequencies2, Freq),
+  {noreply, {F,NewFrequencies2}};
 handle_cast(stop, LoopData) ->
     {stop, normal, LoopData}.
 

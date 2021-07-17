@@ -1,29 +1,27 @@
 -module(gen_consume).
 -behaviour(gen_server).
--export([start_link/1]).
-%-export([start/1]).
+%-export([start_link/1]).
+-export([start/1]).
 %% gen_server callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
 terminate/2, code_change/3]).
 -include_lib("amqp_client/include/amqp_client.hrl").
 -record (state,{sender_pid,addr,booked_queue}).
  
-start_link(AdresseDeMerde) ->
-%start(AdresseDeMerde) ->
+%start_link(Random) ->
+start(Random) ->
 	
-%gen_server:start_link({local, ?MODULE}, ?MODULE, [AdresseDeMerde], []).
-gen_server:start_link( ?MODULE, AdresseDeMerde, []).
+%gen_server:start_link({local, ?MODULE}, ?MODULE, [Random], []).
+gen_server:start( ?MODULE, Random, []).
 
-init(AdresseDeMerde) ->
-	%io:format(">>>>> gen_consume INIT adresse RCPT random ~p ~n",[AdresseDeMerde]),
+init(Random) ->
+	%io:format(">>>>> gen_consume INIT adresse RCPT random ~p ~n",[Random]),
 	%process_flag(trap_exit, true),
 
 	Self = self(),
 
         {ok, QBook} = gen_server:call(frequency, {allocate, Self}),
-	%gen_server:call(frequency, {allocate, Self}),
-        %gproc:send({p, l, my_frequency_proc}, {frequency, {allocate, Self}}),
-        %gproc:send({p, l, my_frequency_proc}, {frequency}),
+	io:format("gen_consume allocate QBook ~p ~n",[QBook]),
 
 
 	F = fun(Key, ContentType, Payload, Header, _State) ->
@@ -36,7 +34,7 @@ Declarations = application:get_env(event_single, consume_declarations),
      {_, Dcls} = Declarations,
 Amqp = #{
   %name => local_service,
-  name => binary_to_atom(AdresseDeMerde),
+  name => binary_to_atom(Random),
   connection => amqp_server,
   function => F,
   %function => fun _Mod:loop/4,
@@ -52,30 +50,32 @@ Amqp = #{
        },
 {ok, _ServicePid} = turtle_service:start_link(Amqp),
 
-State2 = #state{sender_pid=_ServicePid,addr=AdresseDeMerde,booked_queue=QBook},
+State2 = #state{sender_pid=_ServicePid,addr=Random,booked_queue=QBook},
 {ok, State2}.
 
 handle_call({pub}, _From, State) -> 	{reply, ok, State+1}.
 
 handle_cast({pub2}, State) -> {noreply, State}.
 
-%handle_info({ _,undefined,[{<<"To">>,longstr,_RdmAddress},{<<"Ref">>,signedint,Ref},{<<"Dkim">>,longstr,Dkim},{<<"Date">>,longstr,_Date},{<<"Ip">>,longstr,Ip},{<<"Serveur">>,longstr,Serveur},{<<"SPF_PASS">>,signedint,Spf_pass},{<<"EMPTY_MESSAGE">>,signedint,_},{<<"DKIM_VALID">>,signedint,Dkim_valid}],_Hop}=_Unroll, #state{addr=AdresseDeMerde,booked_queue=QBook}=State) when _RdmAddress =:= AdresseDeMerde  -> 
-handle_info({ _,undefined,[{<<"To">>,longstr,_RdmAddress},{<<"Ref">>,signedint,Ref},_,_,_,_,_,_,_],_Hop}=_Unroll, #state{addr=AdresseDeMerde,booked_queue=QBook}=State) when _RdmAddress =:= AdresseDeMerde  -> 
+%handle_info({ _,undefined,[{<<"To">>,longstr,_RdmAddress},{<<"Ref">>,signedint,Ref},{<<"Dkim">>,longstr,Dkim},{<<"Date">>,longstr,_Date},{<<"Ip">>,longstr,Ip},{<<"Serveur">>,longstr,Serveur},{<<"SPF_PASS">>,signedint,Spf_pass},{<<"EMPTY_MESSAGE">>,signedint,_},{<<"DKIM_VALID">>,signedint,Dkim_valid}],_Hop}=_Unroll, #state{addr=Random,booked_queue=QBook}=State) when _RdmAddress =:= Random  -> 
+handle_info({ _,undefined,[{<<"To">>,longstr,_RdmAddress},{<<"Ref">>,signedint,Ref},_,_,_,_,_,_,_],_Hop}=_Unroll, #state{addr=Random,booked_queue=QBook}=State) when _RdmAddress =:= Random  -> 
 	%io:format("gen_consume Tout le pkt AMQP ~p ~n",[Unroll]),
-   	%io:format("gen_consume on filtre en fonction du header To GPROC SEND ~p ~n",[AdresseDeMerde]),
+   	%io:format("gen_consume on filtre en fonction du header To GPROC SEND ~p ~n",[Random]),
 	io:format("gen_consume HANDLE_INFO/3 freq ~p ~n",[QBook]),
 	io:format("gen_consume HANDLE_INFO/3 Hop ~p ~n",[_Hop]),
-        gproc:send({p, l, AdresseDeMerde}, {error,Ref,42}),	
+        gproc:send({p, l, Random}, {error,Ref,42}),	
         %gproc:send({p, l, my_event_proc}, {error,Ref,42}),	
         gen_server:cast(frequency,{deallocate, QBook}),
 	{noreply, State};
-
-handle_info({ _,undefined,[{<<"To">>,longstr,Fuck},_,_,_,_,_,_,_,_],_Hop},#state{addr=AdresseDeMerde}=State) -> 
-	io:format(">>>>>>>> gen_consume handle_info match pas le Fuck ~p ~n",[Fuck]),
-	io:format("gen_consume HANDLE_INFO/3 Hop ~p ~n",[_Hop]),
-	io:format(">>>>>>>> gen_consume handle_info match pas le Adresse_De_Merde ~p ~n",[AdresseDeMerde]),
+%handle_info({ _,undefined,[{<<"To">>,longstr,Fuck},_,_,_,_,_,_,_,_],_Hop},#state{addr=Random}=State) -> 
+%	io:format(">>>>>>>> gen_consume handle_info match pas le Fuck ~p ~n",[Fuck]),
+%	io:format("gen_consume HANDLE_INFO/3 Hop ~p ~n",[_Hop]),
+%	io:format(">>>>>>>> gen_consume handle_info match pas le Adresse_De_Merde ~p ~n",[Random]),
+%	io:format("gen_consume handle_info qui matche pas ~n"),
+%	{noreply, State}.
+handle_info({ _,undefined,[_,_,_,_,_,_,_,_,_],_}, #state{addr=_Random}=State) ->
 	io:format("gen_consume handle_info qui matche pas ~n"),
-	{noreply, State}.
+        {noreply, State}.
 
 
 terminate(_Reason, _State) ->
