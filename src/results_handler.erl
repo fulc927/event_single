@@ -33,10 +33,13 @@ init(Req, _State) ->
     State2 = #state{sender_pid=_SenderPid,booked_queue=QBook},
     {cowboy_loop, Req, State2,hibernate}.
 
-info({results_page, Dkim, Date, Ip, Serveur,Dkim_valid,Payload}, Req, #state{sender_pid=SenderPid,booked_queue=_QBook}=State) ->
+info({results_page, Dkim, Date, Ip, Serveur,Spf_pass,Dkim_valid,Payload}, Req, #state{sender_pid=SenderPid,booked_queue=_QBook}=State) ->
 	io:format("results_handler LA PAGE HTML S AFFICHE ! ~n"),
         gen_server:cast(frequency,{deallocate2, _QBook}),
 	io:format("results_handler QBook2 deallocate2 ! ~n"),
+	io:format("results_handler INSIDE PAGE HTML Spf_pass ~p ~n",[Spf_pass]),
+	io:format("results_handler INSIDE PAGE HTML Serveur ~p ~n",[Serveur]),
+	io:format("results_handler INSIDE PAGE HTML Dkim_valid ~p ~n",[Dkim_valid]),
 	_Title = "le titre",
 	%Body = "le body",
         cowboy_req:reply(200, #{<<"content-type">> => <<"text/html">>}, 
@@ -50,10 +53,10 @@ info({results_page, Dkim, Date, Ip, Serveur,Dkim_valid,Payload}, Req, #state{sen
     <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />
     <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />
     <link rel=\"icon\" href=\"data:;base64,iVBORw0KGgo=\" />
-    <link rel=\"alternate\" type=\"application/rss+xml\" href=\"http://mail-testing.com/index.xml\" title=\"Accessible Minimalism\" />
+    <link rel=\"alternate\" type=\"application/rss+xml\" href=\"http://mail-testing.com/index.xml\" title=\"Mail-testing\" />
     
     
-    <title>Accessible Minimalism</title>
+    <title>Mail-testing</title>
     <style type=\"text/css\">
         .emojify {
 	font-family: Apple Color Emoji, Segoe UI Emoji, NotoColorEmoji, Segoe UI Symbol, Android Emoji, EmojiSymbols;
@@ -95,11 +98,6 @@ info({results_page, Dkim, Date, Ip, Serveur,Dkim_valid,Payload}, Req, #state{sen
       Home
       </a>
     </li>
-    
-    <li>
-      <a href=\"/posts/\">
-      </a>
-    </li>
  <li>
       <a href=\"/home/\">
       About
@@ -108,14 +106,19 @@ info({results_page, Dkim, Date, Ip, Serveur,Dkim_valid,Payload}, Req, #state{sen
 </ul>
 </div>
 
- <h1 style=\"text-align:center\">Results</h1>
+ <h1 style=\"text-align:center\">Resultats</h1>
 
 <pre style=\"width:100%;color:#f8f8f2;background-color:#272822\">",Date,"</pre>
 
+%Pas exploité dans le rendu
+<pre style=\"width:100%;color:#f8f8f2;background-color:#272822\">",Spf_pass,"</pre>
+
 <pre style=\"width:100%;color:#f8f8f2;background-color:#272822\">",Ip,"</pre>
 
+%Pas exploité dans le rendu
 <pre style=\"width:100%;color:#f8f8f2;background-color:#272822\">",Serveur,"</pre>
 
+%Pas exploité dans le rendu
 <pre style=\"width:100%;color:#f8f8f2;background-color:#272822\">",Dkim_valid,"</pre>
 
 <pre style=\"width:100%;color:#f8f8f2;background-color:#272822\">",Dkim,"</pre>
@@ -143,7 +146,7 @@ info({results_null, []}, Req, #state{sender_pid=SenderPid,booked_queue=_QBook}=S
 	io:format("results_handler PAGE NULL sAFFICHE ! ~n"),
         gen_server:cast(frequency,{deallocate2, _QBook}),
 	_Title = "le titre",
-	Message_null = "Aucun message intercepté",
+	Message_null = "Aucun message intercepte",
         cowboy_req:reply(200, #{<<"content-type">> => <<"text/html">>}, 
 		
 %	["<html><head><title>Hello world!</title><script></script></head><body><p><div>page internet hop</div></p></body></html>"]
@@ -159,10 +162,10 @@ info({results_null, []}, Req, #state{sender_pid=SenderPid,booked_queue=_QBook}=S
     <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />
     <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />
     <link rel=\"icon\" href=\"data:;base64,iVBORw0KGgo=\" />
-    <link rel=\"alternate\" type=\"application/rss+xml\" href=\"http://mail-testing.com/index.xml\" title=\"Accessible Minimalism\" />
+    <link rel=\"alternate\" type=\"application/rss+xml\" href=\"http://mail-testing.com/index.xml\" title=\"Mail-testing\" />
     
     
-    <title>Accessible Minimalism</title>
+    <title>Mail-testing</title>
     <style type=\"text/css\">
         .emojify {
 	font-family: Apple Color Emoji, Segoe UI Emoji, NotoColorEmoji, Segoe UI Symbol, Android Emoji, EmojiSymbols;

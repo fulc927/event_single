@@ -76,8 +76,8 @@ handle_call({pub}, _From, State) -> {reply, ok, State+1}.
 
 handle_cast({pub2}, State) -> {noreply, State}.
 
-handle_info({ _,undefined,[_,{<<"Ref">>,signedint,Ref},{<<"Dkim">>,longstr,Dkim},{<<"Date">>,longstr,Date},{<<"Ip">>,longstr,Ip},{<<"Serveur">>,longstr,Serveur},_,_,{<<"DKIM_VALID">>,signedint,Dkim_valid}],Hop}, #state{id=Id}=State) when Ref =:= Id ->
-	gproc:send({p, l, Ref}, {results_page,Dkim,Date,Ip,Serveur,Dkim_valid,Hop}),	
+handle_info({ _,undefined,[_,{<<"Ref">>,signedint,Ref},{<<"Dkim">>,longstr,Dkim},{<<"Date">>,longstr,Date},{<<"Ip">>,longstr,Ip},{<<"Serveur">>,longstr,Serveur},{<<"SPF_PASS">>,signedint,Spf_pass},_,{<<"DKIM_VALID">>,signedint,Dkim_valid}],Hop}, #state{id=Id}=State) when Ref =:= Id ->
+	gproc:send({p, l, Ref}, {results_page,Dkim,Date,Ip,Serveur,Spf_pass,Dkim_valid,Hop}),	
         {noreply, State};
 handle_info({ _,undefined,[_,{<<"Ref">>,signedint,Ref},_,_,_,_,_,_,{<<"DKIM_VALID">>,signedint,_Dkim_valid}],_Hop}, #state{id=Id,badreload=BadReload}=State) when BadReload =:= ok ->
    	io:format("gen_consume_results BATARD Ref ~p ~n",[Ref]),

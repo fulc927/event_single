@@ -28,14 +28,15 @@ start(_Type, _Args) ->
                 },
    		 %The last arg becomes the State arg in the id_handler's init() method.
 
-    CatchallRoute = {"/[...]", no_matching_route_handler, []},
+    %CatchallRoute = {"/[...]", no_matching_route_handler, []},
+    CatchallRoute = {"/[...]", cowboy_static, {priv_file, event_single, "404.html"}},
 
     Dispatch = cowboy_router:compile([
         {"mail-testing.com", [
 	       %{"/", cowboy_static, {priv_file, event_single, "index.html"}},
 		{"/", welcome_page, []},
 	        {"/eventsource", eventsource_h, []},
-	        {"/home", cowboy_static, {priv_file, event_single, "index.html"}},
+	        {"/home", cowboy_static, {priv_file, event_single, "home.html"}},
 	       IdRoute,
 	       CatchallRoute
 	]}

@@ -73,8 +73,10 @@ handle_info({ _,undefined,[{<<"To">>,longstr,_RdmAddress},{<<"Ref">>,signedint,R
 %	io:format(">>>>>>>> gen_consume handle_info match pas le Adresse_De_Merde ~p ~n",[Random]),
 %	io:format("gen_consume handle_info qui matche pas ~n"),
 %	{noreply, State}.
-handle_info({ _,undefined,[_,_,_,_,_,_,_,_,_],_}, #state{addr=_Random}=State) ->
+handle_info({ _,undefined,[To,Ref,_,_,_,_,_,_,_],_}, #state{addr=_Random}=State) ->
 	io:format("gen_consume handle_info qui matche pas ~n"),
+	io:format("gen_consume handle_info qui matche pas To ~p ~n",[To]),
+	io:format("gen_consume handle_info qui matche pas Ref ~p ~n",[Ref]),
         {noreply, State}.
 
 
