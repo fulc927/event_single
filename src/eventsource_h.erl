@@ -8,34 +8,13 @@
 -export([terminate/3]).
 -record (state,{sender_pid,tab,target}).
 
-emptycouple(IdCouple) ->
-	%	[{{{82,64,230,35},19026},<<"f69dfba6ba5c5fe9@mail-testing.com">>}]
-	   If = case gen_server:call(store_and_dispatch, {query,IdCouple}) of
-	            [] ->
-		               <<"badstart">>;
-	            _ ->
-		               [{{{_,_,_,_},_},Target}] = gen_server:call(store_and_dispatch, {query,IdCouple}),
-			       Target 
-		end,
-{If}.
-
 init(Req, _State) ->
 	Table = ets:new(?MODULE,[]),
-        io:format("eventsource_h State ~p ~n",[_State]),
-	
 	%process_flag(trap_exit, true),
 	#{peer := IdCouple} = Req,
-	io:format("eventsource_h IdCouple ~p ~n",[IdCouple]),
-	{Target} = emptycouple(IdCouple),
+	io:format("eventsource_h #peer IdCouple ~p ~n",[IdCouple]),
+	Target = emptycouple(IdCouple),
 	
-	%A = gen_server:call(store_and_dispatch, {query,IdCouple}), 
-       
-	
-	%<<X:64/big-unsigned-integer>> = crypto:strong_rand_bytes(8),
-       %_Random = lists:flatten(io_lib:format("~16.16.0b", [X])), %32=field width, Pad de zero, b est le Mod
-       %Target = list_to_binary(_Random++"@mail-testing.com"),
-        io:format("eventsource_h le email en random ~p ~n",[Target]),
-
         gproc:reg({p, l, Target}),
 
         turtle:publish(my_publisher,
@@ -56,14 +35,27 @@ init(Req, _State) ->
 	State2 = #state{sender_pid=_SenderPid,tab=Table,target=Target},
 	{cowboy_loop, Req0, State2}.
 
+emptycouple(IdCouple) ->
+	io:format("eventsource_h BADSTART ~n"),
+	%	[{{{82,64,230,35},19026},<<"f69dfba6ba5c5fe9@mail-testing.com">>}]
+	   If = case gen_server:call(store_and_dispatch, {query,IdCouple}) of
+	            [] ->
+		               <<"badstart">>;
+	            _ ->
+		               [{{{_,_,_,_},_},Target}] = gen_server:call(store_and_dispatch, {query,IdCouple}),
+			       Target 
+		end,
+	If.
+
 info({message, Msg,[]}, Req, State)  ->
 	Table = State#state.tab,
 	Target = State#state.target,
-	%Target2 = list_to_binary("azerty51@mail-testing.com"),
 	Counter = case ets:lookup(Table, Target) of
 			[{Target,Balance}] -> _NewBalance = Balance - 1
 	end,
+	%%LOG important pour LOOPER l'email random pour cible
 	io:format("eventsource_h Target ~p ~n",[Target]),
+	%%LOG
 	ets:insert(Table, {Target, Counter}),
 
 	cowboy_req:stream_events(#{
@@ -73,11 +65,6 @@ info({message, Msg,[]}, Req, State)  ->
 	}, nofin, Req),
 	erlang:send_after(1000, self(), {message,Msg,[]}),
 	{ok, Req, State};
-%info({message, _Msg,MM}, Req, State) when MM =:= 42  ->
-%        io:format("eventsource_h CA MATCH ?"),
-	%%Req1 = cowboy_req:stream_events(#{}, fin, Req),
-        %io:format("eventsource_h le MM ~p ~n",[MM]),
-	%{stop, Req1, State}.
 info({'EXIT', _From, _Reason}, _Req,State) ->
 	io:format("eventsource_h EXIT intervient la"),
 	    {stop, {shutdown, partner_fled}, State};
@@ -94,7 +81,5 @@ id() ->
 
 
 terminate(Reason, Req, State) ->
-	io:format("eventsource_h terminate Reason ~p ~n",[Reason]),
-	io:format("eventsource_h terminate Req ~p ~n",[Req]),
-	io:format("eventsource_h terminate Req ~p ~n",[State]),
+	io:format("eventsource_h terminate Reason Req State ~p ~p ~p ~n",[Reason,Req,State]),
 	    ok.

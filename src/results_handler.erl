@@ -5,37 +5,75 @@
 -record( state, { sender_pid,booked_queue}).
 
 init(Req, _State) ->
-	%welcome_page Req0 {{93,22,148,15},52793}
 	#{peer := IdCouple} = Req,
-	io:format("result_handlers IdCouple ~p ~n",[IdCouple]),
+	io:format("results_handler #peer IdCouple ~p ~n",[IdCouple]),
+	io:format("results_handler #peer Req ~p ~n",[Req]),
 
+	%%NINENINES access a value bound from the route
 	Id = cowboy_req:binding(id, Req),
-	io:format("result_handlers Id ~p ~n",[Id]),
+	io:format("results_handler init Id de cowboy ~p ~n",[Id]),
+	
 	%results_handler Id 12213958
 	Self = self(),
-        {ok, QBook} = gen_server:call(frequency, {allocate2, Self}),
-        {ok, _SenderPid} = gen_consume_results:start({Id,QBook,IdCouple}),
         E = gen_server:call(store_and_dispatch, {query,IdCouple}), 
-	io:format("results_handler IdCouple from ets store_and_dispatch ~p ~n",[E]),
 
-	%%faire un case la
-	case E of
-		    [] ->
-				io:format("results_handler Case1 ~p ~n",[E]);
-		    _ ->
-				io:format("results_handler Case2 ~p ~n",[E])
-	end,
+	%TEST1
+	{_,Vuck} = test1(E,Self),
+	io:format("results_handler test1 Vuck ~p ~n",[Vuck]),
+        %{ok, QBook} = gen_server:call(queuedistrib, {allocate2, Self}),
 
-	io:format("results_handler QBook2 ~p ~n",[QBook]),
+	io:format("results_handler E IdCouple from ets store_and_dispatch ~p ~n",[E]),
+	io:format("result_handlers Id QBook IdCouple ~p ~p ~p ~n",[Id,Vuck,IdCouple]),
+
+	%TEST2
+	{_,Puck} = test2(E,Id,Vuck,IdCouple),
+
+	io:format("results_handler Puck ~p ~n",[Puck]),
 	io:format("results_handler init STATE ~p ~n",[_State]),
 	%on register avec le binding qui vient du httpc call
+	io:format("results_handler init GPROC ~p ~n",[Id]),
+
+	%% DOUBLE REGISTRATION LOOP AMQP
         gproc:reg({p, l, Id}),
-    State2 = #state{sender_pid=_SenderPid,booked_queue=QBook},
+        gproc:reg({p, l, amqphijack}),
+
+    State2 = #state{sender_pid=Puck,booked_queue=Vuck},
     {cowboy_loop, Req, State2,hibernate}.
+
+
+test1(E,Self) ->
+        Val1 = case E of
+		        [] ->
+				io:format("results_handler BADSTART ~p ~n",[E]),
+				[];
+			_ ->
+				io:format("test1 processus normal affectation d’une QUEUE random ~n"),
+        			{ok, QBook} = gen_server:call(queuedistrib, {allocate2, Self}),
+				QBook
+		    	end,
+  {ok, Val1}.
+
+
+test2(E,Id,QBook,IdCouple) ->
+        Val2 = case E of
+		        [] ->
+				io:format("results_handler BADSTART ~p ~n",[E]),
+				io:format("results_handler E Id IdCouple quand IdCouple est vide ~p ~p ~p ~n",[E,Id,IdCouple]),
+        			gen_server:cast(store_and_dispatch, {insert,IdCouple,[]}),
+				%io:format("results_handler deallocate QBook ~p ~n",[QBook]),
+        			%gen_server:cast(queuedistrib,{deallocate, QBook}),
+        			{ok, SenderPid} = gen_consume_amqphijack:start_link(),
+				SenderPid;
+			_ ->
+				io:format("results_handler E IdCouple est bien la ~p ~n",[E]),
+        			{ok, SenderPid} = gen_consume_results:start({Id,QBook,IdCouple}),
+				SenderPid
+		    	end,
+  {ok, Val2}.
 
 info({results_page, Dkim, Date, Ip, Serveur,Spf_pass,Dkim_valid,Payload}, Req, #state{sender_pid=SenderPid,booked_queue=_QBook}=State) ->
 	io:format("results_handler LA PAGE HTML S AFFICHE ! ~n"),
-        gen_server:cast(frequency,{deallocate2, _QBook}),
+        gen_server:cast(queuedistrib,{deallocate2, _QBook}),
 	io:format("results_handler QBook2 deallocate2 ! ~n"),
 	io:format("results_handler INSIDE PAGE HTML Spf_pass ~p ~n",[Spf_pass]),
 	io:format("results_handler INSIDE PAGE HTML Serveur ~p ~n",[Serveur]),
@@ -144,7 +182,7 @@ info({results_page, Dkim, Date, Ip, Serveur,Spf_pass,Dkim_valid,Payload}, Req, #
 info({results_null, []}, Req, #state{sender_pid=SenderPid,booked_queue=_QBook}=State) ->
 
 	io:format("results_handler PAGE NULL sAFFICHE ! ~n"),
-        gen_server:cast(frequency,{deallocate2, _QBook}),
+        %gen_server:cast(queuedistrib,{deallocate2, _QBook}),
 	_Title = "le titre",
 	Message_null = "Aucun message intercepte",
         cowboy_req:reply(200, #{<<"content-type">> => <<"text/html">>}, 

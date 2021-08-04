@@ -9,7 +9,7 @@ init(Req0, State) ->
 	%enregistrement du couple IP/NAT du navigateur client
 	%welcome_page Req0 {{93,22,148,15},52793}
 	#{peer := IdCouple} = Req0,
-	io:format("welcome_page IdCouple ~p ~n",[IdCouple]),
+	io:format("welcome_page #peer IdCouple ~p ~n",[IdCouple]),
 
 	%CrÃ©ation de l'adresse random
   	<<X:64/big-unsigned-integer>> = crypto:strong_rand_bytes(8),
@@ -18,9 +18,10 @@ init(Req0, State) ->
         io:format("welcome_page le email en random ~p ~n",[Target]),
 
 	%opÃ©rations ETS
+        %E = gen_server:call(store_and_dispatch, {query,IdCouple}), 
+	%io:format("welcome_page LOOKUP ETS renvoi qqlchose en cas de reload intempestif  ~p ~n",[E]),
         gen_server:cast(store_and_dispatch, {insert,IdCouple,Target}),
-        E = gen_server:call(store_and_dispatch, {query,IdCouple}), 
-	io:format("welcome_page lookup ~p ~n",[E]),
+	io:format("welcome_page Insert ip and port du navigateur  ~p ~p ~n",[IdCouple,Target]),
 
 	%Script JAVASCRIPT pour le WSS
 	Script = "<script>function ready() {if (!!window.EventSource) { setupEventSource(); } else { document.getElementById(\"status\").innerHTML = \"Sorry but your browser doesn t support the EventSource API\"; } } function setupEventSource() { var source = new EventSource(\"/eventsource\"); source.addEventListener('message', function(event) { addStatus(event.data); Y = event.data; console.log(Y); }, false); source.addEventListener(\"open\", function(event) { }, false); source.addEventListener(\"error\", function(event) { console.log(Y); location.replace(\"http://mail-testing.com/results/\" + Y); if (event.eventPhase == EventSource.CLOSED) { } }, false); } function addStatus(text) { document.getElementById(\"status\").innerHTML=text + \" secs\"; }</script>",
@@ -48,7 +49,8 @@ init(Req0, State) ->
     </style>
     </head>
 
-    <body onload=\"ready();\">
+    <!-- <body onload=\"ready();\">  --»
+    <body>
     <div style=\"overflow: hidden;\">
     <!-- <p style=\"float: left;\"><a href=\"#nav-menu\">Menu</a></p> <p style=\"float: right;\"><a\"><strong>Menu du site</strong></a></p> --> 
     <ul style=\"float: right;\">
@@ -68,8 +70,8 @@ init(Req0, State) ->
 
   <h1 style=\"text-align:center\">Mail-testing</h1>
 		
-  <div> <div style=\"text-align:center\">",Target,"</div>
-<!--<div style=\"text-align:center\"><button onclick=\"ready();\"> Lancer le test </button> </div>  -->
+<!--  <div> <div style=\"text-align:center\">",Target,"</div> -->
+<div style=\"text-align:center\">",Target,"<button onclick=\"ready();\"> Lancer le test </button> </div>
 <div style=\"text-align:center\" id=\"status\"></div>
 </body>
 
