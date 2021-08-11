@@ -5,9 +5,9 @@
 -record( state, { sender_pid,booked_queue}).
 
 init(Req, _State) ->
-	#{peer := IdCouple} = Req,
-	io:format("results_handler #peer IdCouple ~p ~n",[IdCouple]),
-	io:format("results_handler #peer Req ~p ~n",[Req]),
+	%#{peer := IdCouple} = Req,
+	%io:format("results_handler #peer IdCouple ~p ~n",[IdCouple]),
+	%io:format("results_handler #peer Req ~p ~n",[Req]),
 
 	%%NINENINES access a value bound from the route
 	Id = cowboy_req:binding(id, Req),
@@ -15,20 +15,23 @@ init(Req, _State) ->
 	
 	%results_handler Id 12213958
 	Self = self(),
-        E = gen_server:call(store_and_dispatch, {query,IdCouple}), 
+	
+        %E = gen_server:call(store_and_dispatch, {query2,IdCouple}), 
+	%io:format("results_handler le E il se cache ou ? ~p ~n",[E]),
 
 	%TEST1
-	{_,Vuck} = test1(E,Self),
-	io:format("results_handler test1 Vuck ~p ~n",[Vuck]),
-        %{ok, QBook} = gen_server:call(queuedistrib, {allocate2, Self}),
+	{_,QBook} = test1(Id,Self),
+	%io:format("results_handler test1 Vuck ~p ~n",[Vuck]),
+	%io:format("results_handler E IdCouple from ets store_and_dispatch ~p ~n",[E]),
+	%io:format("result_handlers Id QBook IdCouple ~p ~p ~p ~n",[Id,Vuck,IdCouple]),
 
-	io:format("results_handler E IdCouple from ets store_and_dispatch ~p ~n",[E]),
-	io:format("result_handlers Id QBook IdCouple ~p ~p ~p ~n",[Id,Vuck,IdCouple]),
+ 	%{ok, QBook} = gen_server:call(queuedistrib, {allocate2, Self}),
 
 	%TEST2
-	{_,Puck} = test2(E,Id,Vuck,IdCouple),
+	{_,SenderPid} = test2(Id,QBook),
+        %{ok, SenderPid} = gen_consume_results:start({Id,QBook}),
 
-	io:format("results_handler Puck ~p ~n",[Puck]),
+	io:format("results_handler QBook ~p ~n",[QBook]),
 	io:format("results_handler init STATE ~p ~n",[_State]),
 	%on register avec le binding qui vient du httpc call
 	io:format("results_handler init GPROC ~p ~n",[Id]),
@@ -37,16 +40,193 @@ init(Req, _State) ->
         gproc:reg({p, l, Id}),
         gproc:reg({p, l, amqphijack}),
 
-    State2 = #state{sender_pid=Puck,booked_queue=Vuck},
+    State2 = #state{sender_pid=SenderPid,booked_queue=QBook},
     {cowboy_loop, Req, State2,hibernate}.
 
 
-test1(E,Self) ->
-        Val1 = case E of
-		        [] ->
-				io:format("results_handler BADSTART ~p ~n",[E]),
+test1(Id,Self) ->
+        Val1 = case Id of
+		        59  ->
+				io:format("results_handler BADSTART ~n"),
 				[];
-			_ ->
+			58  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			57  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			56  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			55  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			54  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			53  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			52  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			51  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			50  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			49  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			48  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			47  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			46  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			45  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			44  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			43  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			42  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			41  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			40  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			39  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			38  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			37  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			36  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			35  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			34  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			33  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			32  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			31  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			30  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			29  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			28  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			27  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			26  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			25  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			24  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			23  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			22  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			21  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			20  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			19  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			18  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			17  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			16  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			15  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			14  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			13  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			12  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			11  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			10  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			9  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			8  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			7  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			6  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			5  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			4  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			3  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			2  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			1  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+			0  ->
+				io:format("results_handler BADSTART ~n"),
+				[];
+_ ->
 				io:format("test1 processus normal affectation d’une QUEUE random ~n"),
         			{ok, QBook} = gen_server:call(queuedistrib, {allocate2, Self}),
 				QBook
@@ -54,23 +234,21 @@ test1(E,Self) ->
   {ok, Val1}.
 
 
-test2(E,Id,QBook,IdCouple) ->
-        Val2 = case E of
+test2(Id,QBook) ->
+        Val2 = case QBook of
 		        [] ->
-				io:format("results_handler BADSTART ~p ~n",[E]),
-				io:format("results_handler E Id IdCouple quand IdCouple est vide ~p ~p ~p ~n",[E,Id,IdCouple]),
-        			gen_server:cast(store_and_dispatch, {insert,IdCouple,[]}),
-				%io:format("results_handler deallocate QBook ~p ~n",[QBook]),
-        			%gen_server:cast(queuedistrib,{deallocate, QBook}),
+				io:format("results_handler Id quand ça BADSTART ~p ~n",[Id]),
+%        			gen_server:cast(store_and_dispatch, {insert,IdCouple,[]}),
         			{ok, SenderPid} = gen_consume_amqphijack:start_link(),
 				SenderPid;
 			_ ->
-				io:format("results_handler E IdCouple est bien la ~p ~n",[E]),
-        			{ok, SenderPid} = gen_consume_results:start({Id,QBook,IdCouple}),
+%				io:format("results_handler E IdCouple est bien la ~p ~n",[E]),
+        			{ok, SenderPid} = gen_consume_results:start({Id,QBook}),
 				SenderPid
 		    	end,
   {ok, Val2}.
 
+%info({results_page, Dkim, Date, Ip, Serveur,Spf_pass,Dkim_valid,Payload}, Req, #state{sender_pid=SenderPid,booked_queue=_QBook,idcouple=IdCouple}=State) ->
 info({results_page, Dkim, Date, Ip, Serveur,Spf_pass,Dkim_valid,Payload}, Req, #state{sender_pid=SenderPid,booked_queue=_QBook}=State) ->
 	io:format("results_handler LA PAGE HTML S AFFICHE ! ~n"),
         gen_server:cast(queuedistrib,{deallocate2, _QBook}),
@@ -91,7 +269,7 @@ info({results_page, Dkim, Date, Ip, Serveur,Spf_pass,Dkim_valid,Payload}, Req, #
     <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />
     <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />
     <link rel=\"icon\" href=\"data:;base64,iVBORw0KGgo=\" />
-    <link rel=\"alternate\" type=\"application/rss+xml\" href=\"http://mail-testing.com/index.xml\" title=\"Mail-testing\" />
+    <link rel=\"alternate\" type=\"application/rss+xml\" href=\"https://mail-testing.com/index.xml\" title=\"Mail-testing\" />
     
     
     <title>Mail-testing</title>
@@ -129,7 +307,7 @@ info({results_page, Dkim, Date, Ip, Serveur,Spf_pass,Dkim_valid,Payload}, Req, #
 <body>
 
 <div style=\"overflow: hidden;\">
-  <p style=\"float: left;\"><a href=\"http://mail-testing.com\"><=Mail-testing</a></p>
+  <p style=\"float: left;\"><a href=\"https://mail-testing.com\"><=Mail-testing</a></p>
 <ul style=\"float: right;\">
     <li> 
       <a href=\"/\">
@@ -176,9 +354,17 @@ info({results_page, Dkim, Date, Ip, Serveur,Spf_pass,Dkim_valid,Payload}, Req, #
 			 Req),
 
 	  %  cowboy_req:reply(200, #{}, Body, Req),
+	
+	%%%DELETE du putain de port HTTPS
+        %gen_server:cast(store_and_dispatch, {delete,IdCouple}), 
+       	%Eau = gen_server:call(store_and_dispatch, {query,IdCouple}), 
+	%io:format("results_handler VRAIMENT SUPPRIME ? ~p ~n",[Eau]),
+	%%%DELETE 
+
 	gen_server:stop(SenderPid),
 	        {stop, Req, State};
 
+%info({results_null, []}, Req, #state{sender_pid=SenderPid,booked_queue=_QBook,idcouple=IdCouple}=State) ->
 info({results_null, []}, Req, #state{sender_pid=SenderPid,booked_queue=_QBook}=State) ->
 
 	io:format("results_handler PAGE NULL sAFFICHE ! ~n"),
@@ -200,7 +386,7 @@ info({results_null, []}, Req, #state{sender_pid=SenderPid,booked_queue=_QBook}=S
     <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />
     <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />
     <link rel=\"icon\" href=\"data:;base64,iVBORw0KGgo=\" />
-    <link rel=\"alternate\" type=\"application/rss+xml\" href=\"http://mail-testing.com/index.xml\" title=\"Mail-testing\" />
+    <link rel=\"alternate\" type=\"application/rss+xml\" href=\"https://mail-testing.com/index.xml\" title=\"Mail-testing\" />
     
     
     <title>Mail-testing</title>
@@ -238,7 +424,7 @@ info({results_null, []}, Req, #state{sender_pid=SenderPid,booked_queue=_QBook}=S
 <body>
 
 <div style=\"overflow: hidden;\">
-  <p style=\"float: left;\"><a href=\"http://mail-testing.com\">Back</a></p>
+  <p style=\"float: left;\"><a href=\"https://mail-testing.com\">Back</a></p>
 <ul style=\"float: right;\">
     <li> 
       <a href=\"/\">
@@ -262,6 +448,11 @@ info({results_null, []}, Req, #state{sender_pid=SenderPid,booked_queue=_QBook}=S
 </html>"
 ],Req),
 
+	%%%DELETE du putain de port HTTPS
+        %gen_server:cast(store_and_dispatch, {delete,IdCouple}), 
+       	%Eau = gen_server:call(store_and_dispatch, {query,IdCouple}), 
+	%io:format("results_handler VRAIMENT SUPPRIME ? ~p ~n",[Eau]),
+	%%%DELETE 
 
 	gen_server:stop(SenderPid),
 	        {stop, Req, State};

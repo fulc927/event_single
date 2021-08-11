@@ -13,7 +13,8 @@ init(Req, _State) ->
 	%process_flag(trap_exit, true),
 	#{peer := IdCouple} = Req,
 	io:format("eventsource_h #peer IdCouple ~p ~n",[IdCouple]),
-	Target = emptycouple(IdCouple),
+	%Target = emptycouple(IdCouple),
+        [{{_,_,_,_},Target}] = gen_server:call(store_and_dispatch, {query,IdCouple}),
 	
         gproc:reg({p, l, Target}),
 
@@ -35,17 +36,17 @@ init(Req, _State) ->
 	State2 = #state{sender_pid=_SenderPid,tab=Table,target=Target},
 	{cowboy_loop, Req0, State2}.
 
-emptycouple(IdCouple) ->
-	io:format("eventsource_h BADSTART ~n"),
-	%	[{{{82,64,230,35},19026},<<"f69dfba6ba5c5fe9@mail-testing.com">>}]
-	   If = case gen_server:call(store_and_dispatch, {query,IdCouple}) of
-	            [] ->
-		               <<"badstart">>;
-	            _ ->
-		               [{{{_,_,_,_},_},Target}] = gen_server:call(store_and_dispatch, {query,IdCouple}),
-			       Target 
-		end,
-	If.
+%emptycouple(IdCouple) ->
+%	io:format("eventsource_h BADSTART ~n"),
+%	%	[{{{82,64,230,35},19026},<<"f69dfba6ba5c5fe9@mail-testing.com">>}]
+%	   If = case gen_server:call(store_and_dispatch, {query,IdCouple}) of
+%	            [] ->
+%		               <<"badstart">>;
+%	            _ ->
+%		               [{{_,_,_,_},Target}] = gen_server:call(store_and_dispatch, {query,IdCouple}),
+%			       Target 
+%		end,
+%	If.
 
 info({message, Msg,[]}, Req, State)  ->
 	Table = State#state.tab,

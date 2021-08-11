@@ -24,7 +24,7 @@ init(Req0, State) ->
 	io:format("welcome_page Insert ip and port du navigateur  ~p ~p ~n",[IdCouple,Target]),
 
 	%Script JAVASCRIPT pour le WSS
-	Script = "<script>function ready() {if (!!window.EventSource) { setupEventSource(); } else { document.getElementById(\"status\").innerHTML = \"Sorry but your browser doesn t support the EventSource API\"; } } function setupEventSource() { var source = new EventSource(\"/eventsource\"); source.addEventListener('message', function(event) { addStatus(event.data); Y = event.data; console.log(Y); }, false); source.addEventListener(\"open\", function(event) { }, false); source.addEventListener(\"error\", function(event) { console.log(Y); location.replace(\"http://mail-testing.com/results/\" + Y); if (event.eventPhase == EventSource.CLOSED) { } }, false); } function addStatus(text) { document.getElementById(\"status\").innerHTML=text + \" secs\"; }</script>",
+	Script = "<script>function ready() {if (!!window.EventSource) { setupEventSource(); } else { document.getElementById(\"status\").innerHTML = \"Sorry but your browser doesn t support the EventSource API\"; } } function setupEventSource() { var source = new EventSource(\"/eventsource\"); source.addEventListener('message', function(event) { addStatus(event.data); Y = event.data; console.log(Y); }, false); source.addEventListener(\"open\", function(event) { }, false); source.addEventListener(\"error\", function(event) { console.log(Y); location.replace(\"https://mail-testing.com/results/\" + Y); if (event.eventPhase == EventSource.CLOSED) { } }, false); } function addStatus(text) { document.getElementById(\"status\").innerHTML=text + \" secs\"; }</script>",
 	Req = cowboy_req:stream_reply(200, #{<<"content-type">> => <<"text/html">>}, Req0),
 	timer:sleep(1000),
 
@@ -37,7 +37,7 @@ init(Req0, State) ->
     <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />
     <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />
     <link rel=\"icon\" href=\"data:;base64,iVBORw0KGgo=\" />
-    <link rel=\"alternate\" type=\"application/rss+xml\" href=\"http://mail-testing.com/index.xml\" title=\"Mail-testing\" />
+    <link rel=\"alternate\" type=\"application/rss+xml\" href=\"https://mail-testing.com/index.xml\" title=\"Mail-testing\" />
     <title>Mail-testing</title>",
     Script,
  % CSS
@@ -51,9 +51,30 @@ init(Req0, State) ->
 
     <!-- <body onload=\"ready();\">  --»
     <body>
-    <div style=\"overflow: hidden;\">
-    <!-- <p style=\"float: left;\"><a href=\"#nav-menu\">Menu</a></p> <p style=\"float: right;\"><a\"><strong>Menu du site</strong></a></p> --> 
-    <ul style=\"float: right;\">
+
+		
+<!-- <div style=\"text-align:center\">",Target,"<br><button onclick=\"ready();\"> Lancer le test </button> </div>
+<input type=\"button\" value=\"button\">
+<div style=\"text-align:center\" id=\"status\"></div>   
+
+
+
+<h1 style=\"text-align:center\">Mail-testing</h1>
+",Target,"
+<div style=\"text-align:center\"><input type=\"button\" value=\"button\"></div>
+<div id=\"status\"></div>
+</div>    -->
+
+
+<div style=\"position:relative;\">
+  <h1 style=\"text-align:center\">Mail-testing</h1>
+ <div style=\"text-align:center\">",Target,"</div>
+<div style=\"text-align:center\"><button onclick=\"ready();\"> Lancer le test </button> </div>
+  <div style=\"text-align:center\" id=\"status\"></div>
+
+
+  <div style=\"position:absolute;right:0;top:0\">
+    <ul>
       <li> 
         <a href=\"/\">
         Home
@@ -66,13 +87,15 @@ init(Req0, State) ->
         </a>
       </li>
     </ul>
-    </div>
 
-  <h1 style=\"text-align:center\">Mail-testing</h1>
-		
-<!--  <div> <div style=\"text-align:center\">",Target,"</div> -->
-<div style=\"text-align:center\">",Target,"<button onclick=\"ready();\"> Lancer le test </button> </div>
-<div style=\"text-align:center\" id=\"status\"></div>
+  </div>
+</div>
+
+
+
+
+
+
 </body>
 
 </html>"

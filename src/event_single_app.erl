@@ -19,6 +19,7 @@ positive_fun(forward, _) ->
 start(_Type, _Args) ->
     %le nom de la table servant a transférer les couples ip/ports est event_single_app ?MODULE
     ?MODULE = ets:new(?MODULE, [named_table, ordered_set, public]),
+    ets:new(event_single_app2, [named_table, ordered_set, public]),
 
     IdConstraints = { id, [int, fun positive_fun/2] },
     IdRoute =   {"/results/:id",
@@ -31,21 +32,43 @@ start(_Type, _Args) ->
     %CatchallRoute = {"/[...]", no_matching_route_handler, []},
     CatchallRoute = {"/[...]", cowboy_static, {priv_file, event_single, "404.html"}},
 
-    Dispatch = cowboy_router:compile([
+  %  Dispatch_80 = cowboy_router:compile([
+  %      {"mail-testing.com", [
+  %      {"/", welcome_page, []},
+  %      {"/eventsource", eventsource_h, []},
+        %{"/home", cowboy_static, {priv_file, event_single, "home.html"}},
+	     %   %IdRoute,
+  %	        CatchallRoute
+%	]}
+  %  ]),
+
+    Dispatch_443 = cowboy_router:compile([
         {"mail-testing.com", [
-	       %{"/", cowboy_static, {priv_file, event_single, "index.html"}},
 		{"/", welcome_page, []},
 	        {"/eventsource", eventsource_h, []},
 	        {"/home", cowboy_static, {priv_file, event_single, "home.html"}},
-	       IdRoute,
-	       CatchallRoute
+	        IdRoute,
+	        CatchallRoute
 	]}
     ]),
 
-    {ok, _} = cowboy:start_clear(my_http_listener,
-        [{port, 80}],
-        #{env => #{dispatch => Dispatch} }
+    {ok, _} = cowboy:start_tls(my_https_listener,
+    %{ok, _} = cowboy:start_clear(my_http_listener,
+        
+ 	[{port, 443},
+        {certfile, "/etc/letsencrypt/live/mail-testing.com/fullchain.pem"},
+        {keyfile, "/etc/letsencrypt/live/mail-testing.com/privkey.pem"}], 
+				 
+%	[{port, 80}],
+        #{env => #{dispatch => Dispatch_443} }
     ),
+    %%%EXPERIMENTAL
+  %  {ok, _} = cowboy:start_clear(my_http_listener,
+  %      
+%	[{port, 80}],
+%        #{env => #{dispatch => Dispatch_80} }
+%    ),
+
 
     event_single_sup:start_link().
 
