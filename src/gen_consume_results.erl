@@ -63,18 +63,20 @@ handle_call({pub}, _From, State) -> {reply, ok, State+1}.
 
 handle_cast({pub}, #state{}) -> {noreply, #state{}}.
 
-handle_info({ _,undefined,[_,{<<"Ref">>,signedint,Ref},{<<"Dkim">>,longstr,Dkim},{<<"Date">>,longstr,Date},{<<"Ip">>,longstr,Ip},{<<"Serveur">>,longstr,Serveur},{<<"SPF_PASS">>,signedint,Spf_pass},_,{<<"DKIM_VALID">>,signedint,Dkim_valid}],Hop}, #state{id=Id}=State) when Ref =:= Id ->
+handle_info({ _,undefined,[_,{<<"Ref">>,signedint,Ref},{<<"Dkim">>,longstr,Dkim},{<<"Date">>,longstr,Date},{<<"Ip">>,longstr,Ip},{<<"Serveur">>,longstr,Serveur},{<<"SPF_PASS">>,signedint,Spf_pass},{<<"SPF_PASS">>,signedint,Spf2_pass},_,{<<"DKIM_VALID">>,signedint,Dkim_valid}],Hop}, #state{id=Id}=State) when Ref =:= Id ->
    	io:format("gen_consume_results Ref ~p ~n",[Ref]),
    	io:format("gen_consume_results Id ~p ~n",[Id]),
-	gproc:send({p, l, Ref}, {results_page,Dkim,Date,Ip,Serveur,Spf_pass,Dkim_valid,Hop}),	
+   	io:format("gen_consume_results Spf_pass ~p ~n",[Spf_pass]),
+   	io:format("gen_consume_results Dkim_valid ~p ~n",[Dkim_valid]),
+	gproc:send({p, l, Ref}, {results_page,Dkim,Date,Ip,Serveur,Spf_pass,Spf2_pass,Dkim_valid,Hop}),	
         {noreply, State};
-handle_info({ _,undefined,[_,{<<"Ref">>,signedint,Ref},_,_,_,_,_,_,_],_Hop}, #state{id=Id}=State) when Id =:= 58 ->
+handle_info({ _,undefined,[_,{<<"Ref">>,signedint,Ref},_,_,_,_,_,_,_,_],_Hop}, #state{id=Id}=State) when Id =:= 58 ->
 %   	io:format("gen_consume_results BATARD Ref ~p ~n",[Ref]),
 %   	io:format("gen_consume_results BATARD Id ~p ~n",[Id]),
 %	%gproc:send({p, l, Id}, {results_null,<<"Dkim">>,<<"Date">>,<<"Ip">>,<<"Serveur">>,1,<<"hoppoeébpba">>}),	
 	gproc:send({p, l, Ref}, {results_null,[]}),	
         {noreply, State};
-handle_info({ _,undefined,[_,{<<"Ref">>,signedint,_Ref},_,_,_,_,_,_,_],_Hop}, #state{id=_Id}=State) ->
+handle_info({ _,undefined,[_,{<<"Ref">>,signedint,_Ref},_,_,_,_,_,_,_,_],_Hop}, #state{id=_Id}=State) ->
 	io:format("gen_consume_results handle_info qui matche pas ~n"),
         {noreply, State}.
 

@@ -1,7 +1,7 @@
 -module(welcome_page).
 -behavior(cowboy_handler).
-
--export([init/2]).
+-include_lib("kernel/include/inet.hrl").
+-export([init/2,test/1]).
 %-export([info/3]).
 
 init(Req0, State) ->
@@ -10,6 +10,16 @@ init(Req0, State) ->
 	%welcome_page Req0 {{93,22,148,15},52793}
 	#{peer := IdCouple} = Req0,
 	io:format("welcome_page #peer IdCouple ~p ~n",[IdCouple]),
+	io:format("welcome_page Req ~p ~n",[Req0]),
+	{{A,_B,_C,_D,_E,_F,_G,_H}=Touc,_} =  IdCouple,
+	io:format("welcome_page Touc ~p ~n",[Touc]),
+	Touc4 = inet:ipv4_mapped_ipv6_address(Touc),
+	io:format("welcome_page Touc4 ~p ~n",[Touc4]),
+
+	%
+	{ok, Image} = test(A),
+	io:format("welcome_page Image ~p ~n",[Image]),
+
 
 	%CrÃ©ation de l'adresse random
   	<<X:64/big-unsigned-integer>> = crypto:strong_rand_bytes(8),
@@ -49,50 +59,36 @@ init(Req0, State) ->
     </style>
     </head>
 
-    <!-- <body onload=\"ready();\">  --»
+    <!-- <body onload=\"ready();\">  -->
     <body>
-
-		
-<!-- <div style=\"text-align:center\">",Target,"<br><button onclick=\"ready();\"> Lancer le test </button> </div>
-<input type=\"button\" value=\"button\">
-<div style=\"text-align:center\" id=\"status\"></div>   
-
-
-
-<h1 style=\"text-align:center\">Mail-testing</h1>
-",Target,"
-<div style=\"text-align:center\"><input type=\"button\" value=\"button\"></div>
-<div id=\"status\"></div>
-</div>    -->
+	<div style=\"position:relative;\">
+  	<h1 style=\"text-align:center\">Mail-testing</h1>
+ 	<div style=\"text-align:center\">",Target,"</div>
+	<div style=\"text-align:center\"><button onclick=\"ready();\"> Lancer le test </button> </div>
+  	<div style=\"text-align:center\" id=\"status\"></div>
 
 
-<div style=\"position:relative;\">
-  <h1 style=\"text-align:center\">Mail-testing</h1>
- <div style=\"text-align:center\">",Target,"</div>
-<div style=\"text-align:center\"><button onclick=\"ready();\"> Lancer le test </button> </div>
-  <div style=\"text-align:center\" id=\"status\"></div>
-
-
-  <div style=\"position:absolute;right:0;top:0\">
-    <ul>
-      <li> 
-        <a href=\"/\">
-        Home
-        </a>
-      </li>
+  	<div style=\"position:absolute;right:0;top:0\">
+    		<ul>
+      			<li> 
+        			<a href=\"/\">
+        			Home
+        			</a>
+      			</li>
     
-      <li>
-        <a href=\"/home/\">
-        About
-        </a>
-      </li>
-    </ul>
+      			<li>
+        			<a href=\"/home/\">
+        			About
+        			</a>
+      			</li>
+    		</ul>
+  	</div>
+ 	
+	<!-- <div style=\"position:absolute;left:0;top:0\">   <img src=\"/home/img/rabb.png\" alt=\"Girl in a jacket\"> </div> -->
 
-  </div>
-</div>
-
-
-
+	</div>
+        </br>
+	<div style=\"text-align:center\"> <img src=",Image," alt=\"Girl in a jacket\"> </div>
 
 
 
@@ -104,6 +100,21 @@ init(Req0, State) ->
 			       Req),
 
     {ok, Req, State}.
+
+%{{_A,_B,_C,_D,_E,_F,_G,_H}=Touc,_} =  IdCouple,
+%	io:format("welcome_page Touc ~p ~n",[Touc]),
+%	Touc4 = inet:ipv4_mapped_ipv6_address(Touc),
+%	io:format("welcome_page Touc4 ~p ~n",[Touc4]),
+test(A) ->
+        Image = case A of
+		        0 ->
+				io:format("welcome_handler CAS IPV4 ~n"),
+				"/home/img/rabb.png";
+			_ ->
+				io:format("welcome_hadler CAS IPV6 ~n"),
+				"/home/img/rabb_move.gif"
+		    	end,
+{ok, Image}.
 
 %info({reply, Body}, Req, State) ->
 %	    cowboy_req:reply(200, #{}, Body, Req),

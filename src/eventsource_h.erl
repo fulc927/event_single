@@ -14,7 +14,8 @@ init(Req, _State) ->
 	#{peer := IdCouple} = Req,
 	io:format("eventsource_h #peer IdCouple ~p ~n",[IdCouple]),
 	%Target = emptycouple(IdCouple),
-        [{{_,_,_,_},Target}] = gen_server:call(store_and_dispatch, {query,IdCouple}),
+        %[{{_,_,_,_},Target}] = gen_server:call(store_and_dispatch, {query,IdCouple}),
+        [{{_,_,_,_,_,_,_,_},Target}] = gen_server:call(store_and_dispatch, {query,IdCouple}),
 	
         gproc:reg({p, l, Target}),
 
@@ -25,7 +26,7 @@ init(Req, _State) ->
                 Target,
                 #{ delivery_mode => persistent }),
 
-  	ets:insert(Table, {Target,59}),
+  	ets:insert(Table, {Target,56}),
         {ok, _SenderPid} = gen_consume:start(Target),
 
 	Req0 = cowboy_req:stream_reply(200, #{
@@ -34,6 +35,7 @@ init(Req, _State) ->
 
 	erlang:send_after(1000, self(), {message, Target, []}),
 	State2 = #state{sender_pid=_SenderPid,tab=Table,target=Target},
+	%State2 = #state{tab=Table,target=Target},
 	{cowboy_loop, Req0, State2}.
 
 %emptycouple(IdCouple) ->

@@ -57,14 +57,14 @@ handle_call({pub}, _From, State) -> {reply, ok, State+1}.
 
 handle_cast({pub2}, State) -> {noreply, State}.
 
-handle_info({ _,undefined,[{<<"To">>,longstr,_RdmAddress},{<<"Ref">>,signedint,Ref},_,_,_,_,_,_,_],_Hop}=_Unroll, #state{addr=Random,booked_queue=QBook}=State) when _RdmAddress =:= Random  -> 
+handle_info({ _,undefined,[{<<"To">>,longstr,_RdmAddress},{<<"Ref">>,signedint,Ref},_,_,_,_,_,_,_,_],_Hop}=_Unroll, #state{addr=Random,booked_queue=QBook}=State) when _RdmAddress =:= Random  -> 
 	io:format("gen_consume HANDLE_INFO/3 QueueBooked ~p ~n",[QBook]),
 	io:format("gen_consume HANDLE_INFO/3 Hop ~p ~n",[_Hop]),
 
         gproc:send({p, l, Random}, {error,Ref,42}),	
         gen_server:cast(queuedistrib,{deallocate, QBook}),
 	{noreply, State};
-handle_info({ _,undefined,[To,Ref,_,_,_,_,_,_,_],_}, #state{addr=_Random}=State) ->
+handle_info({ _,undefined,[To,Ref,_,_,_,_,_,_,_,_],_}, #state{addr=_Random}=State) ->
 	io:format("gen_consume handle_info qui matche pas. To & Ref ~p ~p ~n",[To,Ref]),
         {noreply, State}.
 

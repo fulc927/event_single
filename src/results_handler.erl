@@ -249,11 +249,12 @@ test2(Id,QBook) ->
   {ok, Val2}.
 
 %info({results_page, Dkim, Date, Ip, Serveur,Spf_pass,Dkim_valid,Payload}, Req, #state{sender_pid=SenderPid,booked_queue=_QBook,idcouple=IdCouple}=State) ->
-info({results_page, Dkim, Date, Ip, Serveur,Spf_pass,Dkim_valid,Payload}, Req, #state{sender_pid=SenderPid,booked_queue=_QBook}=State) ->
+info({results_page, Dkim, Date, Ip, Serveur,Spf_pass,Spf2_pass,Dkim_valid,Payload}, Req, #state{sender_pid=SenderPid,booked_queue=_QBook}=State) ->
 	io:format("results_handler LA PAGE HTML S AFFICHE ! ~n"),
         gen_server:cast(queuedistrib,{deallocate2, _QBook}),
 	io:format("results_handler QBook2 deallocate2 ! ~n"),
 	io:format("results_handler INSIDE PAGE HTML Spf_pass ~p ~n",[Spf_pass]),
+	io:format("results_handler INSIDE PAGE HTML Spf2_pass ~p ~n",[Spf2_pass]),
 	io:format("results_handler INSIDE PAGE HTML Serveur ~p ~n",[Serveur]),
 	io:format("results_handler INSIDE PAGE HTML Dkim_valid ~p ~n",[Dkim_valid]),
 	_Title = "le titre",
@@ -328,6 +329,7 @@ info({results_page, Dkim, Date, Ip, Serveur,Spf_pass,Dkim_valid,Payload}, Req, #
 
 %Pas exploité dans le rendu
 <pre style=\"width:100%;color:#f8f8f2;background-color:#272822\">",Spf_pass,"</pre>
+<pre style=\"width:100%;color:#f8f8f2;background-color:#272822\">",Spf2_pass,"</pre>
 
 <pre style=\"width:100%;color:#f8f8f2;background-color:#272822\">",Ip,"</pre>
 

@@ -17,10 +17,12 @@ init([]) ->
 handle_cast({insert,{{A,B,C,D},_E}=Couple,Target},State) ->
   	ets:insert(event_single_app, {{A,B,C,D},Target}),
 	ets:insert(event_single_app2, {Couple,Target}),
-	%Ligne de lookup test et facultative
-	%Alurs = ets:lookup(event_single_app, {A,B,C,D}), 
-	%io:format("Alurs? on lookup Couple ~p ~n",[Alurs]),
   	io:format("Alurs Ip and Target ~p ~p ~p ~p ~p ~p ~n",[A,B,C,D,_E,Target]),
+  {noreply, State};
+handle_cast({insert,{{A,B,C,D,Z,Y,X,W},_E}=Couple,Target},State) ->
+  	ets:insert(event_single_app, {{A,B,C,D,Z,Y,X,W},Target}),
+	ets:insert(event_single_app2, {Couple,Target}),
+  	io:format("Alurs Ip and Target ~p ~p ~p ~p ~p ~p ~p ~p ~p ~p ~n",[A,B,C,D,Z,Y,X,W,_E,Target]),
   {noreply, State};
 handle_cast({delete,{{A,B,C,D},_E}},State) ->
   	ets:delete(event_single_app,{A,B,C,D}),
@@ -28,18 +30,16 @@ handle_cast({delete,{{A,B,C,D},_E}},State) ->
 	io:format("Alors? on lookup Couple ~p ~n",[Alors]),
   {noreply, State}.
 
-handle_call({query,{{A,B,C,D},_E}=Couple}, _From, State) ->
+%handle_call({query,{{A,B,C,D},_E}=Couple}, _From, State) ->
+%	io:format("store_and_dispatch query Couple ~p ~n",[Couple]),
+%	Reply = ets:lookup(event_single_app, {A,B,C,D}), 
+%	io:format("store_and_dispatch Reply ~p ~n",[Reply]),
+%{reply, Reply, State}.
+handle_call({query,{{A,B,C,D,Z,Y,X,W},_E}=Couple}, _From, State) ->
 	io:format("store_and_dispatch query Couple ~p ~n",[Couple]),
-	%Reply = ets:lookup(event_single_app, {{A,B,C,D},E}), 
-	Reply = ets:lookup(event_single_app, {A,B,C,D}), 
+	Reply = ets:lookup(event_single_app, {A,B,C,D,Z,Y,X,W}), 
 	io:format("store_and_dispatch Reply ~p ~n",[Reply]),
-	% TEST NÉCESSAIRE À CE NIVEAU !!! si Reply = []
-{reply, Reply, State};
-handle_call({query2,{{A,B,C,D},E}=Couple}, _From, State) ->
-	io:format("store_and_dispatch query Couple ~p ~n",[Couple]),
-	Reply2 = ets:lookup(event_single_app2, {{A,B,C,D},E}), 
-	io:format("store_and_dispatch Reply2 ~p ~n",[Reply2]),
-{reply, Reply2, State}.
+{reply, Reply, State}.
 
 handle_info(_Msg, LoopData) ->
   {noreply, LoopData}.
