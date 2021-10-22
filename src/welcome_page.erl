@@ -16,10 +16,8 @@ init(Req0, State) ->
 	Touc4 = inet:ipv4_mapped_ipv6_address(Touc),
 	io:format("welcome_page Touc4 ~p ~n",[Touc4]),
 
-	%
 	{ok, Image} = test(A),
 	io:format("welcome_page Image ~p ~n",[Image]),
-
 
 	%CrÃ©ation de l'adresse random
   	<<X:64/big-unsigned-integer>> = crypto:strong_rand_bytes(8),
@@ -88,7 +86,8 @@ init(Req0, State) ->
 
 	</div>
         </br>
-	<div style=\"text-align:center\"> <img src=",Image," alt=\"Girl in a jacket\"> </div>
+	<!-- <div style=\"text-align:center\"> <img src=",Image," alt=\"Girl in a jacket\"> </div>  -->
+	     <div style=\"position:absolute;left:0;top:0\">   <img src=",Image," alt=\"Girl in a jacket\"> </div>
 
 
 

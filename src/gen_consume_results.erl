@@ -63,7 +63,7 @@ handle_call({pub}, _From, State) -> {reply, ok, State+1}.
 
 handle_cast({pub}, #state{}) -> {noreply, #state{}}.
 
-handle_info({ _,undefined,[_,{<<"Ref">>,signedint,Ref},{<<"Dkim">>,longstr,Dkim},{<<"Date">>,longstr,Date},{<<"Ip">>,longstr,Ip},{<<"Serveur">>,longstr,Serveur},{<<"SPF_PASS">>,signedint,Spf_pass},{<<"SPF_PASS">>,signedint,Spf2_pass},_,{<<"DKIM_VALID">>,signedint,Dkim_valid}],Hop}, #state{id=Id}=State) when Ref =:= Id ->
+handle_info({ _,undefined,[_,{<<"Ref">>,signedint,Ref},{<<"Dkim">>,longstr,Dkim},{<<"Date">>,longstr,Date},{<<"Ip">>,longstr,Ip},{<<"Serveur">>,longstr,Serveur},{<<"SPF_PASS">>,longstr,Spf_pass},{<<"SPF_PASS">>,longstr,Spf2_pass},_,{<<"DKIM_VALID">>,longstr,Dkim_valid}],Hop}, #state{id=Id}=State) when Ref =:= Id ->
    	io:format("gen_consume_results Ref ~p ~n",[Ref]),
    	io:format("gen_consume_results Id ~p ~n",[Id]),
    	io:format("gen_consume_results Spf_pass ~p ~n",[Spf_pass]),

@@ -27,6 +27,7 @@ init(Req, _State) ->
                 #{ delivery_mode => persistent }),
 
   	ets:insert(Table, {Target,56}),
+	io:format("eventsource_h le Random passé a gen_consume ~p ~n",[Target]),
         {ok, _SenderPid} = gen_consume:start(Target),
 
 	Req0 = cowboy_req:stream_reply(200, #{

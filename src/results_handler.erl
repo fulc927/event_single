@@ -249,7 +249,7 @@ test2(Id,QBook) ->
   {ok, Val2}.
 
 %info({results_page, Dkim, Date, Ip, Serveur,Spf_pass,Dkim_valid,Payload}, Req, #state{sender_pid=SenderPid,booked_queue=_QBook,idcouple=IdCouple}=State) ->
-info({results_page, Dkim, Date, Ip, Serveur,Spf_pass,Spf2_pass,Dkim_valid,Payload}, Req, #state{sender_pid=SenderPid,booked_queue=_QBook}=State) ->
+info({results_page, Dkim, Date, Ip, Serveur,Spf2_pass,Spf_pass,Dkim_valid,Payload}, Req, #state{sender_pid=SenderPid,booked_queue=_QBook}=State) ->
 	io:format("results_handler LA PAGE HTML S AFFICHE ! ~n"),
         gen_server:cast(queuedistrib,{deallocate2, _QBook}),
 	io:format("results_handler QBook2 deallocate2 ! ~n"),
@@ -327,22 +327,37 @@ info({results_page, Dkim, Date, Ip, Serveur,Spf_pass,Spf2_pass,Dkim_valid,Payloa
 
 <pre style=\"width:100%;color:#f8f8f2;background-color:#272822\">",Date,"</pre>
 
-%Pas exploité dans le rendu
-<pre style=\"width:100%;color:#f8f8f2;background-color:#272822\">",Spf_pass,"</pre>
-<pre style=\"width:100%;color:#f8f8f2;background-color:#272822\">",Spf2_pass,"</pre>
+<div> <a style=\"float: right;font-size: 75%;color: orange;\" href=\"#show\"class=\"show\">[Show]</a>
+              <a style=\"float: right;font-size: 75%;color: orange;\" href=\"#hide\"class=\"hide\">[Hide]</a> 
+        <div id=\"cont\">lopsum ui i niusrtan i au mnsrt n nstns sd nsrtnn t nt nstnstnan naursitnaietaunrietan rt ng gg gpa gaugepébg biuuinuisnuinuain ii nrsuainnanauinuaiua ii n strnnstrnstrrnstnrtsnrts</div> </div>
+<pre style=\"width:100%;color:#f8f8f2;background-color:#272822\">Le SPF ",Spf_pass,"</pre>
 
-<pre style=\"width:100%;color:#f8f8f2;background-color:#272822\">",Ip,"</pre>
+	<div> <a style=\"float: right;font-size: 75%;color: orange;\" href=\"#show\"class=\"show\">[Show]</a>
+              <a style=\"float: right;font-size: 75%;color: orange;\" href=\"#hide\"class=\"hide\">[Hide]</a> 
+        <div id=\"cont\">lopsum ui i niusrtan i au mnsrt n nstns sd nsrtnn t nt nstnstnan naursitnaietaunrietan rt ng gg gpa gaugepébg biuuinuisnuinuain ii nrsuainnanauinuaiua ii n strnnstrnstrrnstnrtsnrts</div> </div>
+<pre style=\"width:100%;color:#f8f8f2;background-color:#272822\">Le SPF2 ",Spf2_pass,"</pre>
 
-%Pas exploité dans le rendu
-<pre style=\"width:100%;color:#f8f8f2;background-color:#272822\">",Serveur,"</pre>
 
-%Pas exploité dans le rendu
+<div> <a style=\"float: right;font-size: 75%;color: orange;\" href=\"#show\"class=\"show\">[Show]</a>
+              <a style=\"float: right;font-size: 75%;color: orange;\" href=\"#hide\"class=\"hide\">[Hide]</a> 
+        <div id=\"cont\">lopsum ui i niusrtan i au mnsrt n nstns sd nsrtnn t nt nstnstnan naursitnaietaunrietan rt ng gg gpa gaugepébg biuuinuisnuinuain ii nrsuainnanauinuaiua ii n strnnstrnstrrnstnrtsnrts</div> </div>
+<pre style=\"width:100%;color:#f8f8f2;background-color:#272822\">L adresse IP ",Ip,"</pre>
+
+<div> <a style=\"float: right;font-size: 75%;color: orange;\" href=\"#show\"class=\"show\">[Show]</a>
+              <a style=\"float: right;font-size: 75%;color: orange;\" href=\"#hide\"class=\"hide\">[Hide]</a> 
+        <div id=\"cont\">lopsum ui i niusrtan i au mnsrt n nstns sd nsrtnn t nt nstnstnan naursitnaietaunrietan rt ng gg gpa gaugepébg biuuinuisnuinuain ii nrsuainnanauinuaiua ii n strnnstrnstrrnstnrtsnrts</div> </div>
+<pre style=\"width:100%;color:#f8f8f2;background-color:#272822\">Le serveur ",Serveur,"</pre>
+
+<div> <a style=\"float: right;font-size: 75%;color: orange;\" href=\"#show\"class=\"show\">[Show]</a>
+              <a style=\"float: right;font-size: 75%;color: orange;\" href=\"#hide\"class=\"hide\">[Hide]</a> 
+        <div id=\"cont\">lopsum ui i niusrtan i au mnsrt n nstns sd nsrtnn t nt nstnstnan naursitnaietaunrietan rt ng gg gpa gaugepébg biuuinuisnuinuain ii nrsuainnanauinuaiua ii n strnnstrnstrrnstnrtsnrts</div> </div>
 <pre style=\"width:100%;color:#f8f8f2;background-color:#272822\">",Dkim_valid,"</pre>
 
+<div> <a style=\"float: right;font-size: 75%;color: orange;\" href=\"#show\"class=\"show\">[Show]</a>
+              <a style=\"float: right;font-size: 75%;color: orange;\" href=\"#hide\"class=\"hide\">[Hide]</a> 
+        <div id=\"cont\">lopsum ui i niusrtan i au mnsrt n nstns sd nsrtnn t nt nstnstnan naursitnaietaunrietan rt ng gg gpa gaugepébg biuuinuisnuinuain ii nrsuainnanauinuaiua ii n strnnstrnstrrnstnrtsnrts</div> </div>
 <pre style=\"width:100%;color:#f8f8f2;background-color:#272822\">",Dkim,"</pre>
-	<div> <a style=\"float: right;\" href=\"#show\"class=\"show\">[Show]</a>
-              <a style=\"float: right;\" href=\"#hide\"class=\"hide\">[Hide]</a>
-        <div id=\"cont\">Content uiestaunre auinetau tuins t ausnetaunr t tunsetaunrestaun tn ausrnteanute t  tsrntenauiet tn  nrusteanr tarnet narut  netaunrs etaurnet n nrest t  t     srnetaunretanuet      anretaunretanuetan t</div>  </div>
+
 
 <pre style=\"width:100%;color:#f8f8f2;background-color:#272822\">",Payload,"</pre>
 
